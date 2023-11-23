@@ -15,47 +15,48 @@ Lesson 24
 - слияние веток
 
 """
+# Как работает ALL и ANY в этом декораторе?
+# Any - возвращает True, если хотя бы один элемент истинный
+# All - возвращает True, если все элементы истинные
 
-# Разбор домашнего задания с декораторами
-# Часть 1. Простой декоратор
+password = '12345678Aa'
 
-"""
-Декоратор, проверяет аргумент декорируемой функции, коим явяляется строка-пароль по следующим критериям:
-   - Длина пароля должна быть не менее 8 символов.
-   - Пароль должен содержать хотя бы одну цифру.
-   - Пароль должен содержать хотя бы одну заглавную букву.
-   - Пароль должен содержать хотя бы одну строчную букву.
-   - Пароль должен содержать хотя бы один спецсимвол (например, !, @, #, $ и т.д.).
-   
-   Если пароль соответствует всем условиям, функция-декоратор должна вызвать оригинальную функцию. 
-   В противном случае, вернуть сообщение об ошибке.
-   
-   **Напишите функцию `register_user`, которая будет принимать пароль в качестве аргумента**. Эта функция будет возвращать сообщение о успешной регистрации, если пароль прошел проверку, и сообщение об ошибке в противном случае.
+# Вариант на флаге и цикле. Вся строка состоит из цифр целиком.
+flag = True
 
-3. **Используйте декоратор `@password_checker` для функции `register_user`**. При вызове функции `register_user`, декоратор должен автоматически проверить сложность пароля.
+for char in password:
+    if char.isdigit():
+        continue
+    else:
+        flag = False
+        break
 
-"""
+if flag:
+    print('Все символы строки являются цифрами')
+else:
+    print('В строке есть не цифровые символы')
+
+# Вариант с all. Хотим убедится что все символы строки являются цифрами.
+print(all(map(str.isdigit, password)))
+
+# Простые примеры с any и all
+
+print(any([True, False, False]))
+print(any([False, False, False]))
+print(any([False, False, True]))
+
+print(all([True, False, False]))
+print(all([True, True, True]))
+print(all([False, False, False]))
+
+#  более сложный пример с any и all
+products = ['apple', 'banana', 'orange', 'pineapple', 'mango']
+
+# В списке все элементы начинаются с буквы 'a'
+# В списке есть хотя бы один элемент, который начинается с буквы 'a'
+
+print(all(map(lambda x: x.startswith('a'), products)))
+print(any(map(lambda x: x.startswith('a'), products)))
 
 
-def simple_password_ckecker_decorator(func: callable) -> callable:
-    def wrapper(password: str) -> str:
-        if len(password) < 8:
-            raise ValueError('Пароль должен быть не менее 8 символов')
-        if not any(map(str.isdigit, password)):
-            raise ValueError('Пароль должен содержать хотя бы одну цифру')
-        if not any(map(str.isupper, password)):
-            raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
-        if not any(map(str.islower, password)):
-            raise ValueError('Пароль должен содержать хотя бы одну строчную букву')
-        # Проверка на спецсимволы, вхождение в строку '!@#$%^&*()_+-='
-        if not any(map(lambda x: x in '!@#$%^&*()_+-=', password)):
-            raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
-        return func(password)
-
-    return wrapper
-
-
-@simple_password_ckecker_decorator
-def register_user(password: str) -> str:
-    return f'Пользователь зарегистрирован с паролем {password}'
 
