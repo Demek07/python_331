@@ -11,70 +11,77 @@ Lesson 25
 @staticmethod - декоратор для методов которые не работают с атрибутами класса и экземпляра класса
 @classmethod - декоратор для методов которые работают с атрибутами класса
 cls - аналог self, но для класса
+Понятие полиморфизма на примере работы с файлами
 """
 
 
-class Car:
+class JsonFile:
+    def read_json(self):
+        pass
+
+
+class TxtFile:
+    def read_txt(self):
+        pass
+
+
+class CsvFile:
+    def read_csv(self):
+        pass
+
+# Полиморфизм
+"""
+У нас есть три разных файла, это экземпляры разных классов
+Мы просто хотим пройтись по ним и прочитать данные из них
+Как это сделать?
+
+Для этого нам надо вызвать у них РАЗНЫЕ методы.
+Т.е. нужно произвести проверку на тип файла и вызвать соответствующий метод
+"""
+file_1 = JsonFile()
+file_2 = TxtFile()
+file_3 = CsvFile()
+
+
+files = [file_1, file_2, file_3]
+result = []
+for file in files:
+    # isinstance - проверяет является ли объект экземпляром класса
+    # isinstance(объект, класс)
+    if isinstance(file, JsonFile):
+        result.append(file.read_json())
+    elif isinstance(file, TxtFile):
+        result.append(file.read_txt())
+    elif isinstance(file, CsvFile):
+        result.append(file.read_csv())
+    else:
+        raise ValueError('Неизвестный тип файла')
+
+
+class JsonFile:
+    def read(self):
+        print(f'Читаем файл {self.__class__.__name__}')
+
+
+class TxtFile:
+    def read(self):
+        print(f'Читаем файл {self.__class__.__name__}')
+
+
+class CsvFile:
+    def read(self):
+        print(f'Читаем файл {self.__class__.__name__}')
+
+
+file_1 = JsonFile()
+file_2 = TxtFile()
+file_3 = CsvFile()
+
+files = [file_1, file_2, file_3]
+
+result = []
+for file in files:
     """
-    Класс для представления автомобиля.
+    Так как у нас у всех файлов есть метод read, мы можем просто вызвать его
     """
-    id = 0 # Атрибут класса
-
-    def __init__(self, model: str) -> None:
-        self.model = model
-        self.id = Car.id
-        Car.id += 1
-        print(f'Создан автомобиль {self.model} с id {self.id}')
-
-    def run(self) -> None:
-        """
-        Метод для запуска автомобиля.
-        По сути, это функция, описанная внутри класса.
-        """
-        print(f'Автомобиль {self.model} заведен')
-
-    @staticmethod
-    def beep() -> None:
-        """
-        Статический метод для издания звукового сигнала.
-        Он не использует атрибуты экземпляра и атрибуты класса.
-        Т.е. это функция которая связана с классом, но не использует его атрибуты.
-        А без @staticmethod и без self - Она не будет работать.
-        """
-        print('Би-бип!')
-
-    @classmethod
-    def get_car_count(cls) -> int:
-        """
-        Метод, который возвращает количество созданных автомобилей.
-        Является методом класса, т.к. использует атрибут класса, и без
-        декоратора @classmethod не будет работать.
-        """
-        return cls.id
-
-    def get_car_id(self) -> int:
-        """
-        Метод, который возвращает id автомобиля.
-        """
-        return self.id
-
-
-# Создаем экземпляры класса Car
-car1 = Car('BMW')
-car2 = Car('Audi')
-car3 = Car('Mercedes')
-
-# Проверяем счетчик созданных автомобилей
-
-# Мы можем обратиться напрямую к атрибуту класса через имя класса
-print(f'Car.id = {Car.id}')
-# Мы можем воспользоваться методом класса, обратившись к классу (при условии @classmethod)
-print(Car.get_car_count())
-# Мы можем воспользоваться методом класса, обратившись к экземпляру класса (при условии @classmethod)
-print(car1.get_car_count())
-
-
-# Проверяем id автомобилей (у каждого будет свой уникальный id)
-print(car1.get_car_id())
-print(car2.get_car_id())
-print(car3.get_car_id())
+    result.append(file.read())
