@@ -107,3 +107,25 @@ set_password - установить пароль пользователя (пе�
 Проведите тестирование.
 Результат в чат в виде скриншота терминала :)
 """
+
+
+class Password:
+    def __init__(self):
+        self.__password = None
+        self.__min_password_len = 8
+
+    def get_password(self) -> str:
+        return self.__password
+
+    def __check_len_password(self, password: str) -> bool:
+        return len(password) >= self.__min_password_len
+
+    def set_password(self, password: str) -> None:
+        if not self.__check_len_password(password):
+            raise ValueError(f'Пароль должен быть не короче {self.__min_password_len} символов')
+        self.__password = password
+
+
+password = Password()
+password.set_password('1234679546')
+print(password.get_password())
