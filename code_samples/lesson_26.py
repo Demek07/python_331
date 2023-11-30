@@ -51,8 +51,6 @@ class User:
         self.__name = name
         self.__age = age
 
-
-
     def __check_len_name(self, name: str) -> bool:
         """
         Приватный метод для проверки длины имени пользователя. Его нет смысла вызывать извне.
@@ -128,3 +126,36 @@ print(user.name)
 
 Протестируйте установку пароля, получение пароля и удаление пароля
 """
+
+
+class Password:
+    def __init__(self):
+        self.__password = None
+        self.__min_password_len = 8
+
+    def __check_min_password_len(self, new_password: str) -> bool:
+        return len(new_password) >= self.__min_password_len
+
+    @property
+    def password(self) -> str:
+        return self.__password
+
+    @password.setter
+    def password(self, new_password: str) -> None:
+        if self.__check_min_password_len(new_password):
+            self.__password = new_password
+        else:
+            raise ValueError(f'Пароль должен быть длиннее {self.__min_password_len}\n'
+                             f'Добавьте хотя бы еще {self.__min_password_len - len(new_password)} знаков')
+
+    @password.deleter
+    def password(self) -> None:
+        self.__password = 'qwerty'
+
+
+password = Password()
+print(password.password)
+password.password = 13216584
+print(password.password)
+del password.password
+print(password.password)
