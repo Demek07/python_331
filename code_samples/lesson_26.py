@@ -18,6 +18,13 @@ Lesson 26
 Protected - это когда в начале имени атрибута или метода стоит один нижний подчеркивание
 Private - это когда в начале имени атрибута или метода стоит два нижних подчеркивания
 __dict__ - словарь с атрибутами экземпляра класса
+
+getattr(), setattr(), hasattr() и delattr() - функции для работы с атрибутами класса
+getattr(объект, имя_атрибута) - получить значение атрибута
+setattr(объект, имя_атрибута, значение) - установить значение атрибута
+hasattr(объект, имя_атрибута) - проверить есть ли атрибут у объекта
+delattr(объект, имя_атрибута) - удалить атрибут у объекта
+
 """
 
 
@@ -44,15 +51,11 @@ class User:
 # Создаем экземпляр класса
 user = User('Вася', 20)
 
-# Публичные атрибуты
+# getattr() - получить значение атрибута
 print(user.name)
-print(user.age)
+print(getattr(user, 'name'))
+print(getattr(user, 'last_name', None)) # Если атрибута нет, то atrirbute error, но можно указать значение по умолчанию
+print(getattr(user, '_protected'))
+# print(getattr(user, '__private')) # AttributeError: 'User' object has no attribute '__private'
+print(getattr(user, '_User__private'))
 
-# Защищенные атрибуты
-print(user._protected)
-# print(user.__private) # Вызовет ошибку AttributeError: 'User' object has no attribute '__private'
-
-
-# Добудем имена всех атрибутов класса
-print(user.__dict__)
-print(user._User__private)
