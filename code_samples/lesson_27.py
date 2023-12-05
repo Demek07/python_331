@@ -37,3 +37,47 @@ Lesson 27
         
         Добавьте метод display_info, который печатает информацию о матрешке, включая ее размер и цвет.
 """
+
+
+class BigMatryoshka:
+    """
+    Большая Матрешка.
+    Методы:
+    - open - открывает матрешку
+    """
+    def __init__(self):
+        self.size = 'big'
+
+    def open(self):
+        """
+        Открывает матрешку
+        """
+        print('Opening the big matryoshka')
+
+
+class MediumMatryoshka(BigMatryoshka):
+    """
+    Средняя Матрешка.
+    Методы:
+    - open - открывает матрешку
+    - display_info - печатает информацию о матрешке
+    """
+    def __init__(self, color):
+        super().__init__()
+        self.color = color
+
+    def open(self):
+        """
+        Открывает матрешку и вызывает метод open из BigMatryoshka
+
+        :return:
+        """
+        print('Opening the medium matryoshka')
+        super().open()
+
+    def display_info(self):
+        """
+        Печатает информацию о матрешке
+        :return:
+        """
+        print(f'Размер: {self.size}, цвет: {self.color}')
