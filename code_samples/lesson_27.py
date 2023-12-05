@@ -10,32 +10,10 @@ Lesson 27
 - Работа с инициализатором и явное указание инициализатора родительского класса
 - Super - вызов методов родительского класса
 - Практика
+- Решение практики
+- Цепочка наследования
+- Переопределение методов
 
-"""
-"""
-Практика!
-
-Задание: Создание Классов "Матрешка"
-
-Цель задания: Научиться применять принципы наследования 
-в объектно-ориентированном программировании на Python, 
-создавая классы с иерархией наследования и 
-расширяя функциональность базовых классов в производных.
-
-Описание задачи:
-
-    Создайте класс BigMatryoshka (Большая Матрешка), который будет базовым классом.
-        В этом классе должен быть атрибут size, который по умолчанию установлен в значение "big".
-        Добавьте метод open, который печатает "Opening the big matryoshka".
-
-    Создайте класс MediumMatryoshka (Средняя Матрешка), который наследуется от BigMatryoshka.
-        В классе MediumMatryoshka должен быть дополнительный атрибут color, значение которого задается при создании 
-        экземпляра класса.
-        
-        Переопределите метод open так, чтобы он сначала печатал "Opening the medium matryoshka", а затем вызывал
-        метод open из BigMatryoshka через super().
-        
-        Добавьте метод display_info, который печатает информацию о матрешке, включая ее размер и цвет.
 """
 
 
@@ -45,6 +23,7 @@ class BigMatryoshka:
     Методы:
     - open - открывает матрешку
     """
+
     def __init__(self):
         self.size = 'big'
 
@@ -62,6 +41,7 @@ class MediumMatryoshka(BigMatryoshka):
     - open - открывает матрешку
     - display_info - печатает информацию о матрешке
     """
+
     def __init__(self, color):
         super().__init__()
         self.color = color
@@ -72,8 +52,8 @@ class MediumMatryoshka(BigMatryoshka):
 
         :return:
         """
-        print('Opening the medium matryoshka')
         super().open()
+        print('Opening the medium matryoshka')
 
     def display_info(self):
         """
@@ -81,3 +61,34 @@ class MediumMatryoshka(BigMatryoshka):
         :return:
         """
         print(f'Размер: {self.size}, цвет: {self.color}')
+
+
+# Создаем класс SmallMatryoshka
+# Унаследованный от MediumMatryoshka
+
+class SmallMatryoshka(MediumMatryoshka):
+    """
+    Маленькая Матрешка.
+    Методы:
+    - open - открывает матрешку
+    - display_info - печатает информацию о матрешке
+    """
+
+    def __init__(self, color):
+        super().__init__(color)
+        self.size = 'small'
+
+    def open(self):
+        """
+        Открывает матрешку и вызывает метод open из MediumMatryoshka
+
+        :return:
+        """
+        super().open()
+        print('Opening the small matryoshka')
+
+
+# Создаем экземпляр класса SmallMatryoshka
+# Проверяем работу методов
+small_matryoshka = SmallMatryoshka('red')
+small_matryoshka.open()
