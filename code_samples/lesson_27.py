@@ -92,3 +92,21 @@ class SmallMatryoshka(MediumMatryoshka):
 # Проверяем работу методов
 small_matryoshka = SmallMatryoshka('red')
 small_matryoshka.open()
+
+
+class MattrComplect(BigMatryoshka, MediumMatryoshka, SmallMatryoshka):
+    """
+    Матрешка комплект.
+    Методы:
+    - open - открывает матрешку
+    - display_info - печатает информацию о матрешке
+    """
+
+    def __init__(self, color):
+        super().__init__(color)
+
+
+# Создаем экземпляр класса MattrComplect
+# Проверяем работу методов
+mattr_complect = MattrComplect('red')
+
