@@ -19,121 +19,114 @@ Lesson 28
 from abc import ABC, abstractmethod
 
 
-class AbstractMatryoshka(ABC):
-    """
-    Класс Матрешка.
-    Методы:
-    - open - открывает матрешку
-    - display_info - печатает информацию о матрешке
-    """
+# Абстрактный класс Матрешка
+class Matryoshka(ABC):
+    counter = 0
 
-    def __init__(self, color):
-        self.color = color
-
-    @abstractmethod
-    def open(self):
-        """
-        Открывает матрешку
-        :return:
-        """
-        pass
-
-    def display_info(self):
-        """
-        Печатает информацию о матрешке
-        :return:
-        """
-        print(f'Цвет: {self.color}')
-
-
-class MetallMixin:
-    """
-    Миксин для металлических игрушек
-    """
     def __init__(self):
-        self.material = 'metal'
-
-    def colorize_metall(self):
-        """
-        Метод для покраски металлических игрушек
-        :return:
-        """
-        print('Colorize metall matryoshka')
+        self.id = Matryoshka.counter
+        Matryoshka.counter += 1
 
 
+# Класс Большая Матрешка
+class BigMatryoshka(Matryoshka):
+    counter = 0
+
+    def __init__(self):
+        super().__init__()
+        self.id = Matryoshka.counter
+        BigMatryoshka.counter += 1
+
+
+# Класс Средняя Матрешка
+class MediumMatryoshka(BigMatryoshka):
+    counter = 0
+
+    def __init__(self):
+        super().__init__()
+        self.id = Matryoshka.counter
+        MediumMatryoshka.counter += 1
+
+
+# Класс Маленькая Матрешка
+class SmallMatryoshka(MediumMatryoshka):
+    counter = 0
+
+    def __init__(self):
+        super().__init__()
+        self.id = Matryoshka.counter
+        SmallMatryoshka.counter += 1
+
+
+# Миксин для деревянных матрешек
 class WoodenMixin:
-    """
-    Миксин для деревянных игрушек
-    """
+    material = "Wood"
+
+    def varnish(self):
+        print("Applying varnish")
+
+    def paint(self):
+        print("Painting with wood paint")
+
+
+# Миксин для металлических матрешек
+class MetalMixin:
+    material = "Metal"
+
+    def paint_for_metal(self):
+        print("Painting with metal paint")
+
+
+# Класс Деревянной Маленькой Матрешки
+class WoodenSmallMatryoshka(SmallMatryoshka, WoodenMixin):
     def __init__(self):
-        self.material = 'wood'
-
-    def colorize_wooden(self):
-        """
-        Метод для покраски деревянных игрушек
-        :return:
-        """
-        print('Colorize wooden matryoshka')
+        super().__init__()
 
 
-class BigMatryoshka(AbstractMatryoshka):
-    """
-    Большая Матрешка.
-    Методы:
-    - open - открывает матрешку
-    """
-
-    def __init__(self, color):
-        super().__init__(color)
-        self.size = 'big'
-
-    def open(self):
-        """
-        Открывает матрешку
-        """
-        print('Opening the big matryoshka')
+# Класс Металлической Маленькой Матрешки
+class MetalSmallMatryoshka(SmallMatryoshka, MetalMixin):
+    def __init__(self):
+        super().__init__()
 
 
-class BigMetallMatryoshka(BigMatryoshka, MetallMixin):
-    """
-    Большая металлическая Матрешка.
-    Методы:
-    - open - открывает матрешку
-    """
+# Создание экземпляров
+wooden_small = WoodenSmallMatryoshka()
+metal_small = MetalSmallMatryoshka()
 
-    def __init__(self, color):
-        super().__init__(color)
-        self.size = 'big'
-        self.colorize_metall()
+wooden_small_1 = WoodenSmallMatryoshka()
+metal_small_1 = MetalSmallMatryoshka()
 
-    def open(self):
-        """
-        Открывает матрешку
-        """
-        print('Opening the big matryoshka')
+wooden_small_2 = WoodenSmallMatryoshka()
+metal_small_2 = MetalSmallMatryoshka()
 
+# Тестирование методов и атрибутов
+wooden_small.paint()
+metal_small.paint_for_metal()
+print(wooden_small.material, wooden_small.id)
+print(metal_small.material, metal_small.id)
 
-"""
-В данном примере у нас есть абстрактный класс AbstractMatryoshka
-От которого будут наследоваться все остальные классы матрешек.
+# Добудем Matryoshka.counter
+print(wooden_small.counter)  # 6
+print(wooden_small.id)  # 1
 
-Есть миксины MetallMixin и WoodenMixin. Т.е. у нас может быть группа миксинов
-связанных с материалом. Так же, у нас может быть группа миксинов, связанная с 
-тематикой матрешки (политика, покемоны, мультфильмы и т.д.)
+print(wooden_small.counter)  # 6
 
-И конечно же с производственным оборудованием.
+print(wooden_small_2.id)  # 5
+print(metal_small_2.id)  # 6
+print(metal_small_2.counter)  # 6
+print(metal_small.counter)  # 6
 
-Миксины словно приправы, которые мы добавляем в нашу матрешку.
+# Counter для big, medium, small
+print(BigMatryoshka.counter)
 
-В итоге, конечная реализация - рабочий класс, экземпляры которого мы будем создавать
-это будет класс BigMetallMatryoshka, который наследуется от BigMatryoshka и MetallMixin.
+# Создадим экземпляр BigMatryoshka
+big = BigMatryoshka()
+print(BigMatryoshka.counter)
+print(metal_small.counter)
 
-Таким образом, мы можем создавать разные комбинации матрешек, в зависимости от того,
-какие миксины мы будем добавлять.
+# Mro - Method Resolution Order
+print(WoodenSmallMatryoshka.mro())
+print(MetalSmallMatryoshka.mro())
 
-Например БольшаяМеталлическаяПокемонМатрешка
-Или МаленькаяДеревяннаяПикачуМатрешка
-
-И все это возможно благодаря миксинам. При этом каждый класс отвечает за свою логику.
-И мы очень легко и быстро сможем её изменить, добавить или убрать.
-"""
+# Порядок подмешивания миксинов (в Джанго, есть ли там приоритеты очередности?)
+# Почему с миксинами мы не увидели в mro что ABC наследуется от object? (а без них видели)
