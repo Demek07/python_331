@@ -93,20 +93,30 @@ class SmallMatryoshka(MediumMatryoshka):
 small_matryoshka = SmallMatryoshka('red')
 small_matryoshka.open()
 
-
+"""
 class MattrComplect(BigMatryoshka, MediumMatryoshka, SmallMatryoshka):
-    """
-    Матрешка комплект.
-    Методы:
-    - open - открывает матрешку
-    - display_info - печатает информацию о матрешке
-    """
+TypeError: Cannot create a consistent method resolution
+order (MRO) for bases BigMatryoshka, MediumMatryoshka, SmallMatryoshka
 
-    def __init__(self, color):
-        super().__init__(color)
+При множественном наследовании возникает проблема с порядком наследования.
+Python не может определить какой метод вызывать, т.к. они есть в разных классах.
 
+MRO - Method Resolution Order - порядок разрешения методов
+"""
 
-# Создаем экземпляр класса MattrComplect
-# Проверяем работу методов
-mattr_complect = MattrComplect('red')
+# class MattrComplect(BigMatryoshka, MediumMatryoshka, SmallMatryoshka):
+#     """
+#     Матрешка комплект.
+#     Методы:
+#     - open - открывает матрешку
+#     - display_info - печатает информацию о матрешке
+#     """
+#
+#     def __init__(self, color):
+#         super().__init__(color)
+#
+#
+# # Создаем экземпляр класса MattrComplect
+# # Проверяем работу методов
+# mattr_complect = MattrComplect('red')
 
