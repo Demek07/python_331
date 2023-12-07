@@ -7,7 +7,12 @@ Lesson 28
 - Цепочка наследования
 - Множественное наследование
 - MRO - Method Resolution Order
+- mro() - метод для получения порядка разрешения методов
 - Абстрактные классы
+- ABC - Abstract Base Class
+- @abstractmethod - декоратор для методов которые должны быть реализованы в потомках
+- isinstance() - функция для проверки является ли объект экземпляром класса или его потомком
+- issubclass() - функция для проверки является ли класс потомком другого класса
 """
 
 from abc import ABC, abstractmethod
@@ -80,5 +85,37 @@ class BigMatryoshka(AbstractMatryoshka):
         pass
 
 
+class MediumMatryoshka(BigMatryoshka):
+    """
+    Средняя Матрешка.
+    Методы:
+    - open - открывает матрешку
+    - display_info - печатает информацию о матрешке
+    """
+
+    def __init__(self, color):
+        super().__init__(color)
+        self.size = 'medium'
+
+
 big_matryoshka = BigMatryoshka('red')
+medium_matryoshka = MediumMatryoshka('blue')
 print(big_matryoshka.get_color())
+print(medium_matryoshka.get_color())
+
+# MRO - Method Resolution Order
+# mro() - метод для получения порядка разрешения методов
+
+print(MediumMatryoshka.mro())
+
+# isinstance() - функция для проверки является ли объект экземпляром класса или его потомком
+print(isinstance(big_matryoshka, BigMatryoshka))  # True
+print(isinstance(big_matryoshka, MediumMatryoshka))  # False
+print(isinstance(big_matryoshka, AbstractMatryoshka))  # True
+print(isinstance(medium_matryoshka, AbstractMatryoshka))  # True
+
+# issubclass() - функция для проверки является ли класс потомком другого класса
+print(issubclass(BigMatryoshka, MediumMatryoshka))  # False
+print(issubclass(MediumMatryoshka, BigMatryoshka))  # True
+print(issubclass(MediumMatryoshka, MediumMatryoshka))  # True
+print(issubclass(BigMatryoshka, AbstractMatryoshka))  # True
