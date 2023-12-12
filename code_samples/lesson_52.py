@@ -35,4 +35,42 @@ __init__ - конструктор класса
 
 """
 
-# kettlebell
+
+class Kettlebell:
+    """
+    Класс гирь для занятий спортом
+    """
+    def __init__(self, weight):
+        self.weight = weight
+
+    def __eq__(self, other):
+        return self.weight == other.weight
+
+    def __ne__(self, other):
+        return self.weight != other.weight
+
+    def __lt__(self, other):
+        return self.weight < other.weight
+
+    def __le__(self, other):
+        return self.weight <= other.weight
+
+    def __gt__(self, other):
+        return self.weight > other.weight
+
+    def __ge__(self, other):
+        return self.weight >= other.weight
+
+    def __str__(self):
+        return f'Гиря весом {self.weight} кг.'
+
+
+kettlebell_1 = Kettlebell(16)
+kettlebell_2 = Kettlebell(24)
+
+print(f'{kettlebell_1} == {kettlebell_2} - {kettlebell_1 == kettlebell_2}')
+print(f'{kettlebell_1} != {kettlebell_2} - {kettlebell_1 != kettlebell_2}')
+print(f'{kettlebell_1} < {kettlebell_2} - {kettlebell_1 < kettlebell_2}')
+print(f'{kettlebell_1} <= {kettlebell_2} - {kettlebell_1 <= kettlebell_2}')
+print(f'{kettlebell_1} > {kettlebell_2} - {kettlebell_1 > kettlebell_2}')
+print(f'{kettlebell_1} >= {kettlebell_2} - {kettlebell_1 >= kettlebell_2}')
