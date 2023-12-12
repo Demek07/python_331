@@ -65,22 +65,7 @@ NotImplemented - когда мы не можем сравнить объекты
 и один из методов сравнения (__lt__, __le__, __gt__, или __ge__).
 """
 from functools import total_ordering
-
-# TODO Практика!
-"""
-Опишите класс Город, у которого есть следующие атрибуты:
-- название (name)
-- население (population)
-
-Импортируйте декоратор total_ordering из модуля functools
-Используйте декоратор total_ordering для определения всех методов сравнения, описав
-лишь необходимый минимум
-
-Опишите метод __str__ для вывода информации о городе в виде:
-"Город: <name>, Население: <population>"
-
-Создайте несколько экземпляров класса Город и сравните их между собой
-"""
+from typing import List
 
 
 @total_ordering
@@ -123,23 +108,16 @@ city1 = City("Moscow", 20000000, 30)
 city2 = City("Saint-Petersburg",20000000,  25)
 city3 = City("Vologda", 500000, 10)
 city4 = City("Krasnodar", 1200000, 7)
+city1.is_used = True
 city2.is_used = True
-city1 = City("Moscow", 20000000, 30)
-
-# if city1.is_city_used():
-#     print("City1 is used")
-#
-# if city2.is_city_used():
-#     print("City2 is used")
 
 
-if city1:
-    print("City1 is used")
+cities: List[City] = [city1, city2, city3, city4]
 
-if city2:
-    print("City2 is used")
+# Как бы могла выглядить проверка на использование города в игре (при условии, что город - это объект класса City)
+# Идем циклом по списку и проверяем города на использование
 
-print(len(city1))
-print(len(city2))
-
-
+for city in cities:
+    if not city:
+        print(f'Город {city.name} не использован\n'
+              f'Может быть использован в игре\n\n')
