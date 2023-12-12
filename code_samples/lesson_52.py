@@ -88,3 +88,24 @@ class City:
     def __init__(self, name, population):
         self.name = name
         self.population = population
+
+    def __str__(self):
+        return f"Город: {self.name}, Население: {self.population}"
+
+    def __eq__(self, other):
+        return self.population == other.population
+
+    def __lt__(self, other):
+        return self.population < other.population
+
+
+city1 = City("Moscow", 20000000)
+city2 = City("Saint-Petersburg", 10000000)
+city3 = City("Bangkok", 10000000)
+
+print(city1 > city2)
+print(city1 < city2)
+print(city1 == city2)
+
+print(city2 == city3)
+
