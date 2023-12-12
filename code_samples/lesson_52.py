@@ -93,7 +93,12 @@ class City:
         return f"Город: {self.name}, Население: {self.population}"
 
     def __eq__(self, other):
-        return self.population == other.population
+        """
+        Сравнение на равенство будет происходить и по названию и по населению
+        В этом случае, ломается логика остальных проверок, сделанных автоматически
+        Т.е. тогда надо их прописать вручную
+        """
+        return self.name == other.name and self.population == other.population
 
     def __lt__(self, other):
         return self.population < other.population
@@ -107,5 +112,5 @@ print(city1 > city2)
 print(city1 < city2)
 print(city1 == city2)
 
-print(city2 == city3)
-
+print(city2 == city3)  # False Питер и Бангкок - разные города, отлично!
+print(city2 <= city3)  # False несмотря на одинаковое население, проверка по названию города не прошла (т.к. логика __eq__ переопределена)
