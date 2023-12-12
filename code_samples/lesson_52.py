@@ -118,3 +118,46 @@ print(f'Сортировка по весу:')
 
 # Проверка приналежности объекта к классу с помощью isinstance()
 print(isinstance(kettlebell_1, Kettlebell))
+
+# Как сравниваются строки на примере метода __eq__
+
+string1 = 'Hello'
+string2 = 'hellO'
+
+print(string1 == string2)  # False
+print(string1 > string2)  # False
+print(string1 < string2)  # True
+
+# Печатаем индексы символов в строках
+[print(f'{string1[i]} - {ord(string1[i])}') for i in range(len(string1))]
+[print(f'{string2[i]} - {ord(string2[i])}') for i in range(len(string2))]
+
+"""
+Сравнение строк в Python происходит лексикографически, что похоже на сравнение в словаре или телефонной книге. 
+При этом сравнении используется порядковый номер каждого символа в Unicode.
+
+Как Происходит Сравнение Строк:
+
+    Посимвольное Сравнение:
+        Сравнение начинается с первых символов двух строк.
+        Если первые символы равны, сравнение продолжается со следующими символами, и так далее.
+
+    Остановка Сравнения:
+        Сравнение прекращается, когда найдены различные символы в соответствующих позициях.
+        Если одна строка является началом другой, более короткая строка считается "меньшей".
+"""
+
+index_list_1 = [ord(string1[i]) for i in range(len(string1))]
+index_list_2 = [ord(string2[i]) for i in range(len(string2))]
+
+# Сравнение по индексам в цикле, как только один из символов будет больше, цикл прервется
+
+for i in range(len(index_list_1)):
+    if index_list_1[i] > index_list_2[i]:
+        print(f'{string1[i]} > {string2[i]}')
+        break
+    elif index_list_1[i] < index_list_2[i]:
+        print(f'{string1[i]} < {string2[i]}')
+        break
+    else:
+        print(f'{string1[i]} = {string2[i]}')
