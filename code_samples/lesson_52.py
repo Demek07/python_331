@@ -85,9 +85,11 @@ from functools import total_ordering
 
 @total_ordering
 class City:
-    def __init__(self, name, population):
+    def __init__(self, name:str, population: int, length: int):
         self.name = name
         self.population = population
+        self.is_used: bool = False
+        self.length = length
 
     def __str__(self):
         return f"Город: {self.name}, Население: {self.population}"
@@ -103,14 +105,41 @@ class City:
     def __lt__(self, other):
         return self.population < other.population
 
+    def __bool__(self):
+        """
+        Проверка, был ли использован ли этот город в игре или нет
+        :return: True если город использован, False если нет
+        """
+        return self.is_used
 
-city1 = City("Moscow", 20000000)
-city2 = City("Saint-Petersburg", 10000000)
-city3 = City("Bangkok", 10000000)
+    def __len__(self):
+        return self.length
 
-print(city1 > city2)
-print(city1 < city2)
-print(city1 == city2)
+    def is_city_used(self):
+        return self.is_used
 
-print(city2 == city3)  # False Питер и Бангкок - разные города, отлично!
-print(city2 <= city3)  # False несмотря на одинаковое население, проверка по названию города не прошла (т.к. логика __eq__ переопределена)
+
+city1 = City("Moscow", 20000000, 30)
+city2 = City("Saint-Petersburg",20000000,  25)
+city3 = City("Vologda", 500000, 10)
+city4 = City("Krasnodar", 1200000, 7)
+city2.is_used = True
+city1 = City("Moscow", 20000000, 30)
+
+# if city1.is_city_used():
+#     print("City1 is used")
+#
+# if city2.is_city_used():
+#     print("City2 is used")
+
+
+if city1:
+    print("City1 is used")
+
+if city2:
+    print("City2 is used")
+
+print(len(city1))
+print(len(city2))
+
+
