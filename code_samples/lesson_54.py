@@ -34,6 +34,8 @@ Lesson 54
 
 
 __call__(self, *args, **kwargs) - вызывается когда объект вызывается как функция
+Агрегация
+Композиция
 """
 from typing import List
 
@@ -43,30 +45,58 @@ __call__(self, *args, **kwargs) - вызывается когда объект �
 Города или что-то другое
 """
 
-# Экземпляры обычного класса не вызываются как функции
-class SomeClass:
-    pass
+
+class Message:
+    def __init__(self, text: str):
+        self.text = text
 
 
-a = SomeClass()
-# a()  # TypeError: 'SomeClass' object is not callable
-
-
-# Экземпляры класса с методом __call__ вызываются как функции
-class PersonGreeter:
-    """
-    Класс для приветствия человека
-    Пример использования:
-    >>> greeter = PersonGreeter("Вася")
-    >>> greeter()
-    Привет, Вася!
-    """
-    def __init__(self, name: str):
+class Person:
+    def __init__(self, name: str, age: int):
         self.name = name
-
-    def __call__(self):
-        print(f"Привет, {self.name}!")
+        self.age = age
 
 
-greeter = PersonGreeter("Вася")
-greeter()  # Привет, Вася!
+"""
+Агрегация - это когда объект состоит из других объектов. Мы передаем
+готовые объекты в конструктор и используем их внутри нашего объекта.
+
+Композиция - это когда объект состоит из других объектов, но мы создаем
+их внутри нашего объекта. То есть, мы создаем объекты внутри нашего объекта
+"""
+
+
+# Greeter - приветствующий вариант с агрегацией
+class Greeter:
+    def __init__(self, person: Person, message: Message):
+        self.person = person
+        self.message = message
+
+    def greet(self):
+        return f"{self.person.name} {self.message.text} вероятно тебе уже {self.person.age} лет"
+
+    def __call__(self, prefix: str):
+        return f"{prefix} {self.greet()}"
+
+
+# Greeter - приветствующий вариант с композицией
+class Greeter2:
+    def __init__(self, name: str, age: int, text: str):
+        self.person = Person(name, age)
+        self.message = Message(text)
+
+    def greet(self):
+        return f"{self.person.name} {self.message.text} вероятно тебе уже {self.person.age} лет"
+
+    def __call__(self, prefix: str):
+        return f"{prefix} {self.greet()}"
+
+
+# Создадим оба варианта исполнения
+person = Person("Женя", 25)
+message = Message("Как дела?")
+greeter = Greeter(person, message)
+print(greeter('Привет!'))
+
+greeter2 = Greeter2("Женя", 25, "Как дела?")
+print(greeter2('Привет!'))
