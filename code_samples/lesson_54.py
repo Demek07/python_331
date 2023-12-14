@@ -50,3 +50,23 @@ class SomeClass:
 
 a = SomeClass()
 # a()  # TypeError: 'SomeClass' object is not callable
+
+
+# Экземпляры класса с методом __call__ вызываются как функции
+class PersonGreeter:
+    """
+    Класс для приветствия человека
+    Пример использования:
+    >>> greeter = PersonGreeter("Вася")
+    >>> greeter()
+    Привет, Вася!
+    """
+    def __init__(self, name: str):
+        self.name = name
+
+    def __call__(self):
+        print(f"Привет, {self.name}!")
+
+
+greeter = PersonGreeter("Вася")
+greeter()  # Привет, Вася!
