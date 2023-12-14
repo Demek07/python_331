@@ -13,7 +13,25 @@ Lesson 54
 - __mod__(self, other) - остаток от деления
 - __pow__(self, other) - возведение в степень
 
+Операции "на месте" - inplace. Изменяют объект на месте. Например +=, -=, *=, /=, //=, %=, **=
+- __iadd__(self, other) - сложение
+- __isub__(self, other) - вычитание
+- __imul__(self, other) - умножение
+- __itruediv__(self, other) - деление
+- __ifloordiv__(self, other) - целочисленное деление
+- __imod__(self, other) - остаток от деления
+- __ipow__(self, other) - возведение в степень
+
+
 Обратные арифметические методы
+- __radd__(self, other) - сложение
+- __rsub__(self, other) - вычитание
+- __rmul__(self, other) - умножение
+- __rtruediv__(self, other) - деление
+- __rfloordiv__(self, other) - целочисленное деление
+- __rmod__(self, other) - остаток от деления
+- __rpow__(self, other) - возведение в степень
+
 
 __call__(self, *args, **kwargs) - вызывается когда объект вызывается как функция
 """
@@ -80,7 +98,17 @@ class BookShelf:
     # Описываем остальные методы и ставим заглушку в виде raise BookMathException
 
     def __sub__(self, other):
-        raise BookMathException("Нельзя вычитать книги из книжной полки")
+        """
+        Метод __sub__ позволяет вычитать книги из книжной полки. Проверяет что второй объект - это книга.
+        Если это не книга - вызывает исключение BookMathException.
+        :param other:
+        :return:
+        """
+        if isinstance(other, Book):
+            # BookShelf([book for book in self.books if book != other]) - создаем новый экземпляр класса BookShelf
+            # и в него передаем список книг, которые не равны книге other
+            return BookShelf([book for book in self.books if book != other])
+        raise BookMathException("Нельзя вычитать из книжной полки что-то, кроме книг")
 
     def __mul__(self, other):
         raise BookMathException("Нельзя умножать книги")
