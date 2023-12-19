@@ -16,6 +16,7 @@ Lesson 56 - Dataclasses
     - metadata - словарь с метаданными
     - __dataclass_fields__['category'].metadata - метаданные конкретного атрибута
 
+__post_init__ - метод, который вызывается после инициализации объекта
 """
 from dataclasses import dataclass, field
 
@@ -25,21 +26,25 @@ class Book:
     title: str
     author: str = field(compare=False)
     year: int = field(compare=False)
-    category: str = field(default='Без категории',  # значение по умолчанию
-                          compare=False,  # участвует ли атрибут в сравнении
-                          repr=False,  # участвует ли атрибут в repr
-                          # метаданные (могут быть использованы в других библиотеках)
-                          metadata={'marshmallow': {'load_only': True}}
-                          )
+
+    def __post_init__(self):
+        """
+        __post_init__ - метод, который вызывается после инициализации объекта
+        В нашем случае происходит проверка типов и значений атрибутов
+        :return:
+        """
+        if not isinstance(self.title, str):
+            raise TypeError(f'Значение title должно быть строкой, а не {type(self.title)}')
+
+        if not isinstance(self.author, str):
+            raise TypeError(f'Значение author должно быть строкой, а не {type(self.author)}')
+
+        if not isinstance(self.year, int):
+            raise TypeError(f'Значение year должно быть числом, а не {type(self.year)}')
+
+        if self.year < 0:
+            raise ValueError(f'Значение year должно быть положительным числом, а не {self.year}')
 
 
-book_1 = Book('Война и мир', 'Лев Толстой', 1869)
-book_2 = Book('Преступление и наказание', 'Федор Достоевский', 1866)
-book_3 = Book('Мастер и Маргарита', 'Михаил Булгаков', 1966)
-
-books = [book_1, book_2, book_3]
-
-print(book_1)
-
-# печатаем метадату - вероятно это никогда не пригодится, но пусть будет
-# print(book_1.__dataclass_fields__['category'].metadata)
+book_1 = Book('Война и мир', 'Лев Толстой', -5)
+book_2 = Book('Незнайка на луне', 'Николай Носов', 1965)
