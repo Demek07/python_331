@@ -11,25 +11,15 @@ Lesson 56 - Dataclasses
 from dataclasses import dataclass
 
 
-@dataclass(order=True)
-class Person:
-    name: str
-    age: int
-    address: str = 'Москва'
+#TODO Практика!
+"""
+Опишите датакласс для описания книги.
+Книга имеет следующие атрибуты:
+- Название
+- Автор
+- Год издания
 
-
-
-
-person = Person('ОлегГ', 23)
-person2 = Person('Олег', 23)
-
-print(person)
-print(person2)
-
-print(id(person))
-print(id(person2))
-
-print(person == person2)
-print(person is person2)
-
-print(person > person2)
+Создайте 3 экземпляра класса книга.
+Создайте список книг.
+Сортируйте список книг.
+"""
