@@ -4,20 +4,24 @@ Lesson 56 - Dataclasses
 
 - Определение датакласса
 - Разница между обычным классом и датаклассом
+- Атрибуты по умолчанию
 - Параметры декоратора dataclass
-    - order
+    - order=True - генерация дандер методов сравнения (по умолчанию генерируется только __eq__)
 """
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(order=True)
 class Person:
     name: str
     age: int
+    address: str = 'Москва'
 
 
-person = Person('Юлия', 24)
-person2 = Person('Юлия', 23)
+
+
+person = Person('ОлегГ', 23)
+person2 = Person('Олег', 23)
 
 print(person)
 print(person2)
@@ -27,3 +31,5 @@ print(id(person2))
 
 print(person == person2)
 print(person is person2)
+
+print(person > person2)
