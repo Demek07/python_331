@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Dict
 
 
-
 class SmartDevice(ABC):
     """
     Абстрактный класс для умных устройств.
     """
+
     def __init__(self, name: str):
         """
         Инициализация умного устройства.
@@ -31,11 +31,11 @@ class SmartDevice(ABC):
         pass
 
 
-
 class SmartBulb(SmartDevice):
     """
     Класс для умной лампочки.
     """
+
     def __init__(self, name: str):
         """
         Инициализация умной лампочки.
@@ -72,11 +72,11 @@ class SmartBulb(SmartDevice):
         self.brightness = brightness
 
 
-
 class SmartSmokeDetector(SmartDevice):
     """
     Класс для умного датчика дыма.
     """
+
     def __init__(self, name: str):
         """
         Инициализация умного датчика дыма.
@@ -116,11 +116,11 @@ class SmartSmokeDetector(SmartDevice):
         return False
 
 
-
 class SmartHumidifier(SmartDevice):
     """
     Класс для умного увлажнителя воздуха.
     """
+
     def __init__(self, name: str):
         """
         Инициализация умного увлажнителя воздуха.
@@ -153,6 +153,7 @@ class UrgentNotificationMixin:
     """
     Миксин для срочного уведомления.
     """
+
     def send_urgent_notification(self, message: str):
         """
         Отправить срочное уведомление.
@@ -162,11 +163,11 @@ class UrgentNotificationMixin:
         print(f"Срочное уведомление: {message}")
 
 
-
 class WiFiConnectionMixin:
     """
     Миксин для подключения к Wi-Fi.
     """
+
     def connect_to_wifi(self, network_name: str, password: str):
         """
         Подключиться к Wi-Fi сети.
@@ -178,11 +179,11 @@ class WiFiConnectionMixin:
         print(f"Подключено к Wi-Fi сети {network_name}")
 
 
-
 class ScheduleMixin:
     """
     Миксин для работы по расписанию.
     """
+
     def __init__(self):
         self.schedule = {}
 
@@ -223,16 +224,15 @@ smoke_detector = SmartSmokeDetectorXiaomi("Кухня")
 humidifier = SmartHumidifierBosch("Спальня")
 humidifier.set_schedule({"08:00": "включить", "23:00": "выключить"})
 
+bulb.turn_on()  # Включить лампочку
+bulb.set_brightness(70)  # Установить яркость 70%
+smoke_detector.turn_on()  # Включить датчик дыма
+humidifier.turn_on()  # Включить увлажнитель
+humidifier.set_humidity(50)  # Установить уровень влажности 50%
 
-bulb.turn_on() # Включить лампочку
-bulb.set_brightness(70) # Установить яркость 70%
-smoke_detector.turn_on() # Включить датчик дыма
-humidifier.turn_on() # Включить увлажнитель
-humidifier.set_humidity(50) # Установить уровень влажности 50%
+print(bulb.get_state())  # Получить состояние лампочки
+print(smoke_detector.get_state())  # Получить состояние датчика дыма
+print(humidifier.get_state())  # Получить состояние увлажнителя
 
-print(bulb.get_state()) # Получить состояние лампочки
-print(smoke_detector.get_state()) # Получить состояние датчика дыма
-print(humidifier.get_state()) # Получить состояние увлажнителя
-
-if smoke_detector.check_smoke(): # Проверить наличие дыма
-    smoke_detector.send_urgent_notification("Обнаружен дым на кухне!") # Отправить срочное уведомление
+if smoke_detector.check_smoke():  # Проверить наличие дыма
+    smoke_detector.send_urgent_notification("Обнаружен дым на кухне!")  # Отправить срочное уведомление
