@@ -61,5 +61,4 @@ if __name__ == "__main__":
     # Создайте экземпляр GameManager и вызовите его, чтобы начать игру
     game_manager = GameManager(json_file, cities, game)
     game_manager()
-
 ```
