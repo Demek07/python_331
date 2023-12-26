@@ -166,3 +166,4 @@ cython_debug/
 /.idea/python_331.iml
 /.idea/vcs.xml
 /code_samples/users.csv
+/code_samples/city.pickle
