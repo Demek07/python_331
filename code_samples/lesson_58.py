@@ -8,29 +8,29 @@ Inner Classes
 """
 
 
-class BlogPost:
-    # Вложенный класс Meta для хранения метаданных
-    class Meta:
-        # Предположим, у нас есть некоторые параметры конфигурации
-        ordering = ['-date_published']
-        db_table = 'blog_post'
+class Car:
+    class Engine:
+        def __init__(self):
+            self.rpm = 0
 
-    def __init__(self, title, content, date_published):
-        self.title = title
-        self.content = content
-        self.date_published = date_published
+        def increase_rpm(self, amount):
+            self.rpm += amount
+            print(f"Текущие обороты двигателя: {self.rpm} RPM.")
 
-    def save(self):
-        # Здесь мог бы быть код для сохранения экземпляра в базу данных
-        print(f"Saving '{self.title}' to table {self.Meta.db_table}")
+    class AcceleratorPedal:
+        def __init__(self, engine):
+            self.engine = engine
 
-    @classmethod
-    def get_all_posts(cls):
-        # Здесь мог бы быть код для получения всех постов из базы данных
-        print(f"Getting all posts ordered by {cls.Meta.ordering[0]}")
+        def press(self, pressure):
+            # Предположим, что давление коррелирует с тем, на сколько увеличиваются обороты
+            rpm_increase = pressure * 100
+            self.engine.increase_rpm(rpm_increase)
 
+    def __init__(self):
+        self.engine = self.Engine()
+        self.accelerator_pedal = self.AcceleratorPedal(self.engine)
 
-# Создание и использование экземпляра BlogPost
-post = BlogPost("My First Post", "Hello, world!", "2021-01-01")
-post.save()  # Сохраняет пост, используя информацию из класса Meta
-BlogPost.get_all_posts()  # Получает все посты, используя порядок из класса Meta
+# Создание экземпляра Car и взаимодействие с педалью газа
+my_car = Car()
+my_car.accelerator_pedal.press(0.5)  # Нажатие на педаль газа
+my_car.accelerator_pedal.press(0.3)  # Нажатие на педаль газа еще раз
