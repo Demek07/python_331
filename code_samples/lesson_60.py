@@ -2,59 +2,84 @@
 Тотальный разбор hw_19.py
 Понятине сериализации и десериализации данных
 pickle
+json
+yaml формат
+pyYAML - yaml
+pip install pyyaml
 """
-from dataclasses import dataclass
-import pickle
-"""
-Сериализация - преобразование данных в строку (например, в json)
-"снимаем сериал" - упрощаем
-
-Десериализация - преобразование данных из строки в объект (например, из json в словарь)
-"""
-
-# pickle - библиотека для сериализации и десериализации данных в бинарном формате
-"""
-Плюсы pickle:
-- Простота использования
-- Поддержка всех типов данных
-- Поддержка пользовательских классов
-
-Минусы pickle:
-- Небезопасен
-- Не поддерживает многопоточность
+from pprint import pprint
 
 """
+Что такое YAML?
+YAML - это формат сериализации данных, 
+который может быть использован для представления данных в виде структуры данных Python.
 
-@dataclass
-class City:
-    name: str
-    population: int
-    subject: str
-    district: str
-    latitude: float
-    longitude: float
-    is_used: bool = False
+Используется в:
+- Docker
+- GitActions
+- Obsidian
+- Много-много где еще :)
 
-    def __str__(self):
-        return f'Город {self.name}. Население: {self.population}. Использование в игре: {self.is_used}'
-
-
-# Создаем экземпляр класса City
-city = City(name='Москва', population=10000000,
-            subject='Москва', district='Центр',
-            latitude=55.7558, longitude=37.6173, is_used=True)
-
-# Печатаем экземпляр класса City до сериализации
-print(f'City до сериализации: {city}')
-
-# Сериализация в бинарный формат и запись в файл
-with open('city.pickle', 'wb') as f:
-    pickle.dump(city, f)
-
-# Десериализация из бинарного формата
-with open('city.pickle', 'rb') as f:
-    city_from_pickle = pickle.load(f)
+Методы:
+- dump - для работы с файлами
+- dumps - для работы со строками
+- load - для работы с файлами
+- loads - для работы со строками
+"""
 
 
-# Печатаем экземпляр класса City после десериализации
-print(f'City после десериализации: {city_from_pickle}')
+
+# Возьмем json строку из файла с городами и запишем ее в yaml файл
+
+json_string = """[
+    {
+        "coords": {
+            "lat": 52.65,
+            "lon": 90.08333
+        },
+        "district": "Сибирский",
+        "name": "Абаза",
+        "population": 14816,
+        "subject": "Хакасия"
+    },
+    {
+        "coords": {
+            "lat": 53.71667,
+            "lon": 91.41667
+        },
+        "district": "Сибирский",
+        "name": "Абакан",
+        "population": 187239,
+        "subject": "Хакасия"
+    }
+]"""
+
+# Десериализуем json строку в python объект
+import json
+
+cities = json.loads(json_string)
+
+# Посмотрим что получилось
+print(type(cities))
+pprint(cities)
+
+# Сериализуем python объект в yaml строку
+import yaml
+
+
+yaml_string = yaml.dump(cities, allow_unicode=True)
+print(type(yaml_string))
+print(yaml_string)
+
+# Сериализуем python объект в yaml файл
+with open('cities.yaml', 'w') as yaml_file:
+    yaml.dump(cities, yaml_file, allow_unicode=True, encoding='utf-8', indent=4)
+
+# Десериализуем yaml строку в python объект из файла
+with open('cities.yaml', 'r') as yaml_file:
+    cities_from_yaml = yaml.load(yaml_file, Loader=yaml.Loader)
+
+
+# Посмотрим что получилось
+print(type(cities_from_yaml))
+pprint(cities_from_yaml)
