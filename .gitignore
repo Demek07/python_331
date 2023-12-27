@@ -167,3 +167,4 @@ cython_debug/
 /.idea/vcs.xml
 /code_samples/users.csv
 /code_samples/city.pickle
+/code_samples/cities.yaml

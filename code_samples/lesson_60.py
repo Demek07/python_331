@@ -73,7 +73,9 @@ print(yaml_string)
 
 # Сериализуем python объект в yaml файл
 with open('cities.yaml', 'w') as yaml_file:
-    yaml.dump(cities, yaml_file, allow_unicode=True, encoding='utf-8', indent=4)
+    # allow_unicode=True - для того, чтобы можно было писать кириллицей
+    # encoding='utf-8' - для того, чтобы можно было писать кириллицей
+    yaml.dump(cities, yaml_file, encoding='utf-8-sig', allow_unicode=True, indent=8)
 
 # Десериализуем yaml строку в python объект из файла
 with open('cities.yaml', 'r') as yaml_file:
