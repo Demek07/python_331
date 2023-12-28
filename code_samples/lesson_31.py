@@ -5,73 +5,63 @@ Lesson 31
 де-сериализация - преобразование строки в объект
 валидация - проверка данных на корректность
 json schema - формат для описания json данных
+pip install jsonschema
 """
 from dataclasses import dataclass
 from pprint import pprint
 from typing import List
 
-# todo Практика
-"""
-1. Датакласс Film
-2. Класс FilmValidator
-- проверка что есть ключи title, year
-- проверка что title - строка, year - число
-3. Класс FilmSerializer
-- принимает словарь - отдает дата класс
-4. Цикл в main функции для проверки
-- получите на выходе список дата классов Film
-"""
+from jsonschema import validate, ValidationError
+from jsonschema._format import FormatChecker
 
+# data = [1, 2, None]
+#
+# schema = {
+#     "type": "array",
+#     "items": {
+#         "type": "integer"
+#     }
+# }
 
-@dataclass
-class Film:
-    title: str
-    year: int
-    director: str
-    screenwriter: str
-    producer: str
-    stage: str
+data = {
+    "name": "John",
+    "last_name": "Iva",
+    "age": 30,
+    "email": "vasa_ivanov@mail.ru",  # 1@ пройдет все проверки (кроме регулярки)
+    "is_active": True,
+    "web-site": "https://vasa-ivanov.ru"
+}
 
+schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string",
+                 "minLength": 3,
+                 "maxLength": 10
+                 },
+        "age": {"type": "integer",
+                "minimum": 18,
+                "maximum": 100
+                },
+        # last_name - ссылка на name
+        "last_name": {"$ref": "#/properties/name"},
+        "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": r"""^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}|(\[(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))(\.(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])){2}\.[0-9]{1,3}\]))$"""
+        },
+        "is_active": {"type": "boolean"},
 
-class FilmValidator:
+        "web-site": {"type": "string",
+                     "format": "uri",
+                     "pattern": r"""^(https?:\/\/)?(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,}$"""
+                     }
+    },
+    "required": ["name", "age", "email", "is_active"],
+}
 
-    @staticmethod
-    def validate(film: dict) -> bool:
-        if not isinstance(film, dict):
-            raise ValueError("Должен быть словарь")
-        if "title" not in film or "year" not in film:
-            raise ValueError("Нет ключей title или year")
-        if not isinstance(film["title"], str):
-            raise ValueError("Ключ title должен быть строкой")
-        if not isinstance(film["year"], int):
-            raise ValueError("Ключ year должен быть числом")
-        return True
-
-
-class FilmSerializer:
-
-    def __init__(self):
-        self.validator = FilmValidator()
-
-    @staticmethod
-    def serialize(film: dict) -> Film:
-        if FilmValidator.validate(film):
-            return Film(**film)
-
-
-def main():
-    from data.marvel import full_dict
-    print(f'Всего фильмов: {len(full_dict)}')
-    films = []
-    for film in full_dict.values():
-        try:
-            film = FilmSerializer.serialize(film)
-            films.append(film)
-        except ValueError as exc:
-            print(f"Ошибка валидации: {exc}")
-
-    print(f'Всего фильмов после: {len(films)}')
-
-
-if __name__ == '__main__':
-    main()
+try:
+    validate(instance=data, schema=schema, format_checker=FormatChecker())
+    # format_checker=FormatChecker() - для запускает "улучшенную" валидацию, которая не особо решает проблему
+except ValidationError as e:
+    print(e)
