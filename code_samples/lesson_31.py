@@ -160,16 +160,32 @@ class StudentValidator:
         return self.__validate()
 
 
-if __name__ == "__main__":
-    # Создаем экземпляр класса StudentValidator
-    validator = StudentValidator()
+class StudentSerializer:
+    """
+    Класс для десериализации данных о студенте.
+    Композиция: создается экземпляр класса валидации при инициализации класса сериализации
+    __call__ принимает словарь, прогоняет его через валидатор и возвращает экземпляр дата-класса Student
+    """
 
-    # Проходимся по списку словарей с данными о студентах
+    def __init__(self):
+        self.__validator = StudentValidator()
+
+    def __call__(self, student_data: dict) -> Student:
+        self.__validator(student_data)
+        return Student(**student_data)
+
+
+if __name__ == "__main__":
+    # Создаем экземпляр сериализатора
+    serializer = StudentSerializer()
+    students_obj_list = []
+
+    # Проходимся по списку словарей и преобразуем их в экземпляры дата-класса Student
     for student in students:
-        # Валидируем данные о студенте
         try:
-            validator(student)
+            student_obj = serializer(student)
+            students_obj_list.append(student_obj)
         except ValueError as e:
-            print(f"Данные о студенте {student.get('name')} не валидны. Ошибка: {e}")
-        else:
-            print(f"Данные о студенте {student.get('name')} валидны")
+            print(f"Ошибка в данных: {e}")
+
+    print(students_obj_list)

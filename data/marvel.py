@@ -426,15 +426,15 @@ full_dict: Dict[int, Dict[str, Any]] = {
     },
     41: {
         'title': 'Войны в доспехах',
-        'year': 2050,
+        'year': 'TBA',
         'director': 'TBA',
         'screenwriter': 'Яссер Лестер',
         'producer': 'Кевин Файги и Джонатан Шварц',
         'stage': 'Шестая фаза'
     },
     42: {
-        'title': 'Баба-Яга и леший',
-        'year': 2050,
+        'title': None,
+        'year': 'TBA',
         'director': 'TBA',
         'screenwriter': 'Яссер Лестер',
         'producer': 'Кевин Файги и Джонатан Шварц',
