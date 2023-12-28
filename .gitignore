@@ -168,3 +168,4 @@ cython_debug/
 /code_samples/users.csv
 /code_samples/city.pickle
 /code_samples/cities.yaml
+/.idea/encodings.xml
