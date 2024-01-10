@@ -45,7 +45,7 @@ persons_list = [
         "email": "123@s.ru",
         "is_married": "True"
     }
-    ]
+]
 
 # Поштучная валидация
 # person_schema = PersonSchema()
@@ -64,18 +64,39 @@ try:
 except ValidationError as e:
     print(e.messages)
 
+# Методы dump и load
+"""
+dump - Сериализует объекты Python в простые типы данных Python, которые затем могут быть легко сериализованы
+ в любой JSON-подобный формат.
+ 
+load - Десериализует объекты Python из строки, содержащей данные JSON.
 
-class UserSchema(Schema):
-    id = fields.Int()
-    name = fields.Str()
-    email = fields.Email()
+Dumps и loads - напрямую для работы со строками
+"""
 
-user_data = {
-    'id': 1,
-    'name': 'Иван',
-    'email': 'ivan@example.com',
-}
+person_1 = Person(name=243, age=30, email="123@mail.ru", is_married=True)
+# TODO: Где исключения, Либовски?
 
-user_schema = UserSchema()
-result = user_schema.dump(user_data)
-print(result)
+
+# dump и dumps
+person_schema = PersonSchema()
+
+person_1_dumped = person_schema.dump(person_1)
+person_1_dumped_str = person_schema.dumps(person_1)
+print(f"{person_1_dumped=}")
+print(f"{type(person_1_dumped)=}")
+print(f"{person_1_dumped_str=}")
+print(f"{type(person_1_dumped_str)=}")
+
+person_str = '{"name": "243", "age": 30, "email": "123@mail.ru", "is_married": true}'
+person_dict = {'name': 30, 'age': 30, 'email': '123@mail.ru', 'is_married': True}
+
+# load и loads
+
+person_1_loaded = person_schema.load(person_dict)
+person_1_loaded_str = person_schema.loads(person_str)
+print(f"{person_1_loaded=}")
+print(f"{type(person_1_loaded)=}")
+print(f"{person_1_loaded_str=}")
+print(f"{type(person_1_loaded_str)=}")
+
