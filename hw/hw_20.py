@@ -73,10 +73,32 @@ class JsonFile:
     - write_data() - запись данных в JSON файл
     """
 
-    def __init__(self, file_name,):
+    def __init__(self, file_name, validator: Validator):
         self.file_name = file_name
+        self.validator = validator
 
-    def read_data(self):
+    def __validate_single_city(self, city: dict) -> bool:
+        """
+        Метод для валидации данных о городе
+        :param city: данные о городе
+        :return: True, если данные валидны, иначе False
+        """
+        return self.validator.validate(city)
+
+    def get_all_cities(self) -> list:
+        """
+        Метод который читает все города из файла и проверяет каждый город на валидность.
+        Возвращает список валидных городов
+        :return: список валидных городов
+        """
+        cities = self.__read_data()
+        valid_cities = []
+        for city in cities:
+            if self.__validate_single_city(city):
+                valid_cities.append(city)
+        return valid_cities
+
+    def __read_data(self):
         """
         Чтение данных из JSON файла
         :return: данные из JSON файла
@@ -85,7 +107,7 @@ class JsonFile:
             data = json.load(json_file)
         return data
 
-    def write_data(self, data):
+    def __write_data(self, data):
         """
         Запись данных в JSON файл
         :param data: данные для записи
@@ -117,6 +139,9 @@ class City:
         if isinstance(other, City):
             return self.name == other.name
         return False
+
+
+
 
 
 class Cities:
