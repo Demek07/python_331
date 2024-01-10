@@ -141,7 +141,33 @@ class City:
         return False
 
 
+class Serializer:
+    """
+    Класс для десериализации данных (в будущем можно описать и сериализацию)
+    Экземпляр внедряется в JsonFile через агрегацию (конструктор)
+    """
 
+    def __init__(self, city_data: list):
+        self.city_data = city_data
+
+    def deserialize(self) -> List[City]:
+        """
+        Метод для десериализации данных
+        :return: список словарей с данными о городах
+        """
+        cities = []
+        for city in self.city_data:
+            cities.append(
+                City(
+                    name=city['name'],
+                    population=city['population'],
+                    subject=city['subject'],
+                    district=city['district'],
+                    latitude=float(city['coords']['lat']),
+                    longitude=float(city['coords']['lon'])
+                )
+            )
+        return cities
 
 
 class Cities:
