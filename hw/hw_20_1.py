@@ -177,37 +177,11 @@ class Serializer:
         return cities
 
 
-class Cities:
-    """
-    Класс для представления данных о городах из JSON-файла.
-    Методы:
-    - __init__(self, city_data) - конструктор класса Cities
-    """
-
-    def __init__(self, city_data, serializer: Serializer):
-        self.city_data = city_data
-        self.serializer = serializer
-        self.cities_obj_list = self.__get_cities_list()
-
-    def __get_cities_list(self):
-        """
-        Получение списка экземпляров класса City
-        из списка словарей с данными о городах
-
-
-        :return: список экземпляров класса City
-        """
-        cities_obj_list = self.serializer()
-        return cities_obj_list
-
-
 class CityGame:
-    def __init__(self, cities: Cities):
-        self.cities_obj = cities
-        self.cities: List[City] = self.cities_obj.cities_obj_list
+    def __init__(self, cities: List[City]):
+        self.cities = cities
         self.human_city: City | None = None
         self.computer_city: City | None = None
-
     @staticmethod
     def check_game_rules(last_city: str, new_city: str) -> bool:
         """
@@ -277,9 +251,8 @@ class CityGame:
 
 
 class GameManager:
-    def __init__(self, json_file: JsonFile, cities: Cities, game: CityGame):
+    def __init__(self, json_file: JsonFile, game: CityGame):
         self.json_file = json_file
-        self.cities = cities
         self.game = game
 
     def __start_game(self):
@@ -308,12 +281,11 @@ if __name__ == "__main__":
     validator = Validator()
 
     # Создаем экземпляр класса JsonFile
-    json_file = JsonFile("D:\Syncthing\Работа\Academy_Top\ПРИМЕРЫ КОДА\python_331\data\cities.json", validator)
-    # Создаем экземпляр класса Cities
-    cities = Cities()
-    # Создаем экземпляр класса CityGame
+    json_file = JsonFile(r"D:\Syncthing\Работа\Academy_Top\ПРИМЕРЫ КОДА\python_331\data\cities.json", validator)
+    cities_data = json_file.get_all_cities()
+    serializer = Serializer(cities_data)
+    cities = serializer()
+
     game = CityGame(cities)
-    # Создаем экземпляр класса GameManager
-    game_manager = GameManager(json_file, cities, game)
-    # Запускаем игру
+    game_manager = GameManager(json_file, game)
     game_manager()
