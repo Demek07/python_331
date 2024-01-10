@@ -17,7 +17,7 @@ from jsonschema import validate, ValidationError
         "population": 187239,
         "subject": "Хакасия"
     }
-    
+
 """
 
 JSON_SCHEMA = {
@@ -150,6 +150,13 @@ class Serializer:
     def __init__(self, city_data: list):
         self.city_data = city_data
 
+    def __call__(self) -> List[City]:
+        """
+        Метод для запуска десериализации
+        :return: список экземпляров класса City
+        """
+        return self.deserialize()
+
     def deserialize(self) -> List[City]:
         """
         Метод для десериализации данных
@@ -177,40 +184,20 @@ class Cities:
     - __init__(self, city_data) - конструктор класса Cities
     """
 
-    def __init__(self, city_data):
+    def __init__(self, city_data, serializer: Serializer):
         self.city_data = city_data
+        self.serializer = serializer
         self.cities_obj_list = self.__get_cities_list()
 
     def __get_cities_list(self):
         """
         Получение списка экземпляров класса City
         из списка словарей с данными о городах
-        Исходная структура данных:
-        {
-        "coords": {
-            "lat": "52.65",
-            "lon": "90.08333"
-        },
-        "district": "Сибирский",
-        "name": "Абаза",
-        "population": 14816,
-        "subject": "Хакасия"
-    }
+
 
         :return: список экземпляров класса City
         """
-        cities_obj_list = []
-        for city in self.city_data:
-            cities_obj_list.append(
-                City(
-                    name=city['name'],
-                    population=city['population'],
-                    subject=city['subject'],
-                    district=city['district'],
-                    latitude=float(city['coords']['lat']),
-                    longitude=float(city['coords']['lon'])
-                )
-            )
+        cities_obj_list = self.serializer()
         return cities_obj_list
 
 
@@ -317,10 +304,13 @@ class GameManager:
 
 
 if __name__ == "__main__":
+    # Создаем экземпляр класса Validator
+    validator = Validator()
+
     # Создаем экземпляр класса JsonFile
-    json_file = JsonFile("D:\Syncthing\Работа\Academy_Top\ПРИМЕРЫ КОДА\python_331\data\cities.json")
+    json_file = JsonFile("D:\Syncthing\Работа\Academy_Top\ПРИМЕРЫ КОДА\python_331\data\cities.json", validator)
     # Создаем экземпляр класса Cities
-    cities = Cities(json_file.read_data())
+    cities = Cities()
     # Создаем экземпляр класса CityGame
     game = CityGame(cities)
     # Создаем экземпляр класса GameManager
