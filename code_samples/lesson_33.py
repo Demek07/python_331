@@ -51,53 +51,49 @@ from marshmallow import Schema, fields, ValidationError
 
 # Nested schema - вложенная схема
 
-full_dict = {
-    0: {
+full_dict = [
+    {
         'title': 'Железный человек',
         'year': 2008,
         'director': 'Джон Фавро',
-        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
-        'producer': 'Ави Арад и Кевин Файги',
+        'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
+        'producer': ['Ави Арад', 'Кевин Файги'],
         'stage': 'Первая фаза'
     },
 
-    1: {
+    {
         'title': 'Железный человек',
         'year': 2008,
         'director': 'Джон Фавро',
-        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
-        'producer': 'Ави Арад и Кевин Файги',
+        'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
+        'producer': ['Ави Арад', 'Кевин Файги'],
         'stage': 'Первая фаза'
     }
-}
+]
 
 
-class FilmSchema(Schema):
-    title = fields.Str(required=True)
-    year = fields.Int(required=True,
-                      function=lambda x: x.isdigit() and 1900 < int(x) < 2022)
-
-    director = fields.Str(required=True)
-    screenwriter = fields.Str(required=True)
-    producer = fields.Str(required=True)
-    stage = fields.Str(required=True)
+class NamesListSchema(Schema):
+    """
+    Схема для списка имен
+    """
+    names = fields.List(fields.String())
 
 
-"""
-Проверяем ключи в словаре, и вложенной схемой их значения
-"""
+class MovieSchema(Schema):
+    """
+    Схема для фильма. Screenwriter и producer - вложенные схемы
+    """
+    title = fields.String(required=True)
+    year = fields.Integer(required=True)
+    director = fields.String(required=True)
+    screenwriter = fields.Nested(NamesListSchema, required=True)
+    producer = fields.Nested(NamesListSchema, required=True)
+    stage = fields.String(required=True)
 
 
-class FullSchema(Schema):
-    films = fields.Dict(keys=fields.Int(),
-                        values=fields.Nested(FilmSchema))
+movies_schema = MovieSchema(many=True)
 
-
-# Создаем экземпляр схемы
-full_schema = FullSchema()
-
-# Валидируем данные
 try:
-    full_schema.load(full_dict)
+    movies_schema.load(full_dict)
 except ValidationError as e:
     pprint(e.messages)
