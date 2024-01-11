@@ -43,13 +43,24 @@ Field options:
     - metadata - метаданные
 
 - Возможный вариант проверки номеров телефонов - phonenumbers
+
+- Nested schema - вложенная схема
+- validate - валидация данных
+    - Length - проверка длины
+    - Range - проверка диапазона
+    - OneOf - проверка на вхождение в список
+    - Regexp - проверка регулярным выражением
+    - Equal - проверка на равенство
+    - Email - проверка email
+    - URL - проверка ссылки
 """
 from pprint import pprint
 from typing import Dict, Any
 
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields, ValidationError, validate
 
 # Nested schema - вложенная схема
+
 
 full_dict = [
     {
@@ -63,7 +74,7 @@ full_dict = [
 
     {
         'title': 'Железный человек',
-        'year': 2008,
+        'year': 2023,
         'director': 'Джон Фавро',
         'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
         'producer': ['Ави Арад', 'Кевин Файги'],
@@ -72,28 +83,20 @@ full_dict = [
 ]
 
 
-class NamesListSchema(Schema):
-    """
-    Схема для списка имен
-    """
-    names = fields.List(fields.String())
-
-
 class MovieSchema(Schema):
-    """
-    Схема для фильма. Screenwriter и producer - вложенные схемы
-    """
-    title = fields.String(required=True)
-    year = fields.Integer(required=True)
-    director = fields.String(required=True)
-    screenwriter = fields.Nested(NamesListSchema, required=True)
-    producer = fields.Nested(NamesListSchema, required=True)
-    stage = fields.String(required=True)
+    title = fields.Str()
+    year = fields.Int(validate=validate.Range(1900, 2099))
+    director = fields.Str()
+    screenwriter = fields.List(fields.Str())
+    producer = fields.List(fields.Str())
+    stage = fields.Str()
 
+# Валидация данных
+# Создание схемы
+movie_schema = MovieSchema(many=True)
 
-movies_schema = MovieSchema(many=True)
-
+# Валидация данных
 try:
-    movies_schema.load(full_dict)
+    movie_schema.load(full_dict)
 except ValidationError as e:
-    pprint(e.messages)
+    print(e.messages)
