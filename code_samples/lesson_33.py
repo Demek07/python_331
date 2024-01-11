@@ -45,90 +45,59 @@ Field options:
 - Возможный вариант проверки номеров телефонов - phonenumbers
 """
 from pprint import pprint
+from typing import Dict, Any
 
 from marshmallow import Schema, fields, ValidationError
 
-"""
-Создадим список словарей с данными о людях и попробуем валидировать их с помощью Marshmallow
-На выходе у нас будет список словарей с данными о людях, но уже валидированный с помощью Marshmallow
+# Nested schema - вложенная схема
 
-Используемый метод:
-?
-"""
-people_data = [
-    {'name': 'Alexander',
-     'surname': 'Clark',
-     'email': 'dellis@e.com',
-     'phone_number': '354-462-9819x59090',
-     'address': '187 Justin Skyway\nPort Wesleyberg, NC 78817',
-     'hobby': 'gaming',
-     'work_place': 'Watson-Boyer'},
+full_dict = {
+    0: {
+        'title': 'Железный человек',
+        'year': 2008,
+        'director': 'Джон Фавро',
+        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
+        'producer': 'Ави Арад и Кевин Файги',
+        'stage': 'Первая фаза'
+    },
 
-    {'name': 'Kathy',
-     'surname': 'Boyd',
-     'email': 'pcolon@example.net',
-     'phone_number': '8192903898',
-     'address': '8689 Harper Walks\nNorth Danamouth, CT 14062',
-     'hobby': 'sports',
-     'work_place': 'Curtis, Alvarez and Watkins'},
-
-    {'name': 'Darren',
-     'surname': 'Sanchez',
-     'email': 'omontgomery@example.net',
-     'phone_number': '928-214-2541x5276',
-     'address': '22233 Mejia Junctions\nLake Katherine, GU 35948',
-     'hobby': 'gaming',
-     'work_place': 'Dawson Group'},
-]
-
-
-# Создадим схему для валидации данных об одном человеке (PersonSchema)
-
-class PersonSchema(Schema):
-    name = fields.Str()
-    surname = fields.Str()
-    email = fields.Email()
-    phone_number = fields.Str()
-    address = fields.Str()
-    hobby = fields.Str()
-    work_place = fields.Str()
-
-
-# Создадим экземпляр схемы (many=True - для валидации списка)
-person_schema = PersonSchema(many=True)
-
-# Валидируем данные
-try:
-    person_schema.load(people_data)
-except ValidationError as e:
-    print(e.messages)
-
-# TODO Практика!
-"""
-1. Импортировать marvel full_dict
-2. Создать список словарей (можно через list comprehension) с данными о фильмах
-3. Написать схему для валидации данных о фильме (FilmSchema) - самый простой вариант
-4. Валидировать данные о фильмах с помощью FilmSchema(many=True)
-"""
-
-from data.marvel import full_dict
-
-films_data: list[dict] = [film for film in full_dict.values()]
+    1: {
+        'title': 'Железный человек',
+        'year': 2008,
+        'director': 'Джон Фавро',
+        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
+        'producer': 'Ави Арад и Кевин Файги',
+        'stage': 'Первая фаза'
+    }
+}
 
 
 class FilmSchema(Schema):
-    title = fields.Str(error_messages={'required': 'Это поле обязательно для заполнения',
-                                       'null': 'Название фильма не может быть пустым'})
-    year = fields.Int()
-    director = fields.Str()
-    screenwriter = fields.Str()
-    producer = fields.Str()
-    stage = fields.Str()
+    title = fields.Str(required=True)
+    year = fields.Int(required=True,
+                      function=lambda x: x.isdigit() and 1900 < int(x) < 2022)
+
+    director = fields.Str(required=True)
+    screenwriter = fields.Str(required=True)
+    producer = fields.Str(required=True)
+    stage = fields.Str(required=True)
 
 
-film_schema = FilmSchema(many=True)
+"""
+Проверяем ключи в словаре, и вложенной схемой их значения
+"""
 
+
+class FullSchema(Schema):
+    films = fields.Dict(keys=fields.Int(),
+                        values=fields.Nested(FilmSchema))
+
+
+# Создаем экземпляр схемы
+full_schema = FullSchema()
+
+# Валидируем данные
 try:
-    film_schema.load(films_data)
+    full_schema.load(full_dict)
 except ValidationError as e:
     pprint(e.messages)
