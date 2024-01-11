@@ -31,6 +31,16 @@ marshmallow_jsonschema - расширение для Marshmallow, которое
     - date - дата
     - time - время
 
+Field options:
+    - required - обязательное поле
+    - default - дефолтное значение поля - если в данных нет такого поля, то оно будет заполнено дефолтным значением
+    - allow_none - разрешить None в качестве значения поля
+    - load_only - поле будет использоваться только при загрузке данных
+    - dump_only - поле будет использоваться только при выгрузке данных
+    - validate - валидация данных
+    - missing - значение по умолчанию, если в данных нет такого поля
+    - error_messages - сообщения об ошибках валидации
+    - metadata - метаданные
 
 - Возможный вариант проверки номеров телефонов - phonenumbers
 """
@@ -105,13 +115,16 @@ from data.marvel import full_dict
 
 films_data: list[dict] = [film for film in full_dict.values()]
 
+
 class FilmSchema(Schema):
-    title = fields.Str()
+    title = fields.Str(error_messages={'required': 'Это поле обязательно для заполнения',
+                                       'null': 'Название фильма не может быть пустым'})
     year = fields.Int()
     director = fields.Str()
     screenwriter = fields.Str()
     producer = fields.Str()
     stage = fields.Str()
+
 
 film_schema = FilmSchema(many=True)
 
@@ -119,4 +132,3 @@ try:
     film_schema.load(films_data)
 except ValidationError as e:
     pprint(e.messages)
-
