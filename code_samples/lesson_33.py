@@ -16,7 +16,25 @@ marshmallow_jsonschema - расширение для Marshmallow, которое
     - loads - для работы со строками (из строки в объект)
 
 - Field types:
+    - string - строка
+    - integer - целое число
+    - float - число с плавающей точкой
+    - boolean - булево значение
+    - list - список
+    - dict - словарь
+    - datetime - дата и время
+    - url - ссылка
+    - email - email
+    - uuid - уникальный идентификационный номер
+    - nested - вложенная схема
+    - function - функция
+    - date - дата
+    - time - время
+
+
+- Возможный вариант проверки номеров телефонов - phonenumbers
 """
+from marshmallow import Schema, fields, ValidationError
 
 """
 Создадим список словарей с данными о людях и попробуем валидировать их с помощью Marshmallow
@@ -25,30 +43,10 @@ marshmallow_jsonschema - расширение для Marshmallow, которое
 Используемый метод:
 ?
 """
-
-import random
-import faker
-
-# Создаем экземпляр Faker для генерации данных
-fake = faker.Faker()
-
-# Определяем функцию для генерации одного словаря с данными о человеке
-def generate_person_data():
-    return {
-        "name": fake.first_name(),
-        "surname": fake.last_name(),
-        "email": fake.email(),
-        "phone_number": fake.phone_number(),
-        "address": fake.address(),
-        "hobby": random.choice(["reading", "sports", "traveling", "cooking", "gaming"]),
-        "work_place": fake.company()
-    }
-
-# Генерируем список из 5 словарей
 people_data = [
     {'name': 'Alexander',
      'surname': 'Clark',
-     'email': 'dellis@example.com',
+     'email': 'dellis@e.com',
      'phone_number': '354-462-9819x59090',
      'address': '187 Justin Skyway\nPort Wesleyberg, NC 78817',
      'hobby': 'gaming',
@@ -70,3 +68,33 @@ people_data = [
      'hobby': 'gaming',
      'work_place': 'Dawson Group'},
 ]
+
+
+# Создадим схему для валидации данных об одном человеке (PersonSchema)
+
+class PersonSchema(Schema):
+    name = fields.Str()
+    surname = fields.Str()
+    email = fields.Email()
+    phone_number = fields.Str()
+    address = fields.Str()
+    hobby = fields.Str()
+    work_place = fields.Str()
+
+
+# Создадим экземпляр схемы
+person_schema = PersonSchema()
+
+# Список валидных данных
+valid_people_data = []
+
+# Валидация данных об одном человеке в цикле
+for person in people_data:
+    try:
+        person_schema.load(person)
+    except ValidationError as e:
+        print(e.messages)
+        print('---')
+    else:
+        valid_people_data.append(person)
+        print('.', end='')
