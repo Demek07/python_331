@@ -53,11 +53,17 @@ Field options:
     - Equal - проверка на равенство
     - Email - проверка email
     - URL - проверка ссылки
+
+@post_load - декоратор, который позволяет обрабатывать данные после валидации
+@pre_load - декоратор, который позволяет обрабатывать данные до валидации
+
+Создание экземпляра дата класса после успешной валидации данных, используя @post_load
 """
+from dataclasses import dataclass
 from pprint import pprint
 from typing import Dict, Any
 
-from marshmallow import Schema, fields, ValidationError, validate
+from marshmallow import Schema, fields, ValidationError, validate, post_load
 
 # Nested schema - вложенная схема
 
@@ -74,7 +80,7 @@ full_dict = [
 
     {
         'title': 'Железный человек',
-        'year': 2023,
+        'year': '20G22',
         'director': 'Джон Фавро',
         'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
         'producer': ['Ави Арад', 'Кевин Файги'],
@@ -83,20 +89,45 @@ full_dict = [
 ]
 
 
+@dataclass
+class Movie:
+    title: str
+    year: int
+    director: str
+    screenwriter: list
+    producer: list
+    stage: str
+
+    def __str__(self):
+        return f'Фильм: {self.title}, год: {self.year}'
+
+
+# Схема с @post_load и созданием экземпляра дата класса после успешной валидации данных
 class MovieSchema(Schema):
     title = fields.Str()
-    year = fields.Int(validate=validate.Range(1900, 2099))
+    year = fields.Int()
     director = fields.Str()
     screenwriter = fields.List(fields.Str())
     producer = fields.List(fields.Str())
     stage = fields.Str()
 
-# Валидация данных
-# Создание схемы
-movie_schema = MovieSchema(many=True)
+    @post_load
+    def make_movie(self, data, **kwargs) -> Movie:
+        return Movie(**data)
 
-# Валидация данных
-try:
-    movie_schema.load(full_dict)
-except ValidationError as e:
-    print(e.messages)
+
+# Тестируем
+
+# Создаем экземпляр схемы для поштушной валидации
+movie_schema = MovieSchema()
+
+# Валидируем данные
+films_list: list[Movie] = []
+for film in full_dict:
+    try:
+        movie = movie_schema.load(film)
+        films_list.append(movie)
+    except ValidationError as e:
+        print(e.messages)
+
+[print(film) for film in films_list]
