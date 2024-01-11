@@ -82,19 +82,11 @@ class PersonSchema(Schema):
     work_place = fields.Str()
 
 
-# Создадим экземпляр схемы
-person_schema = PersonSchema()
+# Создадим экземпляр схемы (many=True - для валидации списка)
+person_schema = PersonSchema(many=True)
 
-# Список валидных данных
-valid_people_data = []
-
-# Валидация данных об одном человеке в цикле
-for person in people_data:
-    try:
-        person_schema.load(person)
-    except ValidationError as e:
-        print(e.messages)
-        print('---')
-    else:
-        valid_people_data.append(person)
-        print('.', end='')
+# Валидируем данные
+try:
+    person_schema.load(people_data)
+except ValidationError as e:
+    print(e.messages)
