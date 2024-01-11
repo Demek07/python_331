@@ -59,75 +59,83 @@ Field options:
 
 Создание экземпляра дата класса после успешной валидации данных, используя @post_load
 """
+import json
 from dataclasses import dataclass
 from pprint import pprint
 from typing import Dict, Any
 
 from marshmallow import Schema, fields, ValidationError, validate, post_load
+from marshmallow_dataclass import class_schema
+from marshmallow_jsonschema import JSONSchema
 
-# Nested schema - вложенная схема
-
-
-full_dict = [
+json_string = """[
     {
-        'title': 'Железный человек',
-        'year': 2008,
-        'director': 'Джон Фавро',
-        'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
-        'producer': ['Ави Арад', 'Кевин Файги'],
-        'stage': 'Первая фаза'
+        "coords": {
+            "lat": "52.65",
+            "lon": "90.08333"
+        },
+        "district": "Сибирский",
+        "name": "Абаза",
+        "population": 14816,
+        "subject": "Хакасия"
     },
-
     {
-        'title': 'Железный человек',
-        'year': '20G22',
-        'director': 'Джон Фавро',
-        'screenwriter': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
-        'producer': ['Ави Арад', 'Кевин Файги'],
-        'stage': 'Первая фаза'
+        "coords": {
+            "lat": "53.71667",
+            "lon": "91.41667"
+        },
+        "district": "Сибирский",
+        "name": "Абакан",
+        "population": -187239,
+        "subject": "Хакасия"
     }
-]
+]"""
 
 
+# Создадим dataclass для хранения данных о городах
 @dataclass
-class Movie:
-    title: str
-    year: int
-    director: str
-    screenwriter: list
-    producer: list
-    stage: str
-
-    def __str__(self):
-        return f'Фильм: {self.title}, год: {self.year}'
+class City:
+    name: str
+    subject: str
+    district: str
+    population: int
+    coords: Dict[str, Any]
 
 
-# Схема с @post_load и созданием экземпляра дата класса после успешной валидации данных
-class MovieSchema(Schema):
-    title = fields.Str()
-    year = fields.Int()
-    director = fields.Str()
-    screenwriter = fields.List(fields.Str())
-    producer = fields.List(fields.Str())
-    stage = fields.Str()
-
-    @post_load
-    def make_movie(self, data, **kwargs) -> Movie:
-        return Movie(**data)
+# Создаем схему marshmallow для валидации данных используя marshmallow-dataclass
+CitySchema = class_schema(City)
 
 
-# Тестируем
+# Расширяем базовую схему marshmallow для валидации данных через наследование
+# Добавляем валидацию минимального значения для поля population
 
-# Создаем экземпляр схемы для поштушной валидации
-movie_schema = MovieSchema()
+class DetailedCitySchema(CitySchema):
+    population = fields.Integer(validate=validate.Range(min=0))
 
-# Валидируем данные
-films_list: list[Movie] = []
-for film in full_dict:
-    try:
-        movie = movie_schema.load(film)
-        films_list.append(movie)
-    except ValidationError as e:
-        print(e.messages)
 
-[print(film) for film in films_list]
+# Валидируем данные пачкой
+valid_cities: list[City] = []
+try:
+    cities = DetailedCitySchema(many=True).loads(json_string)
+except ValidationError as e:
+    print(e.messages)
+
+
+# Валидируем данные поштучно (но для этого придется превратить строку в список словарей)
+# valid_cities: list[City] = []
+#
+# # Экземпляр схемы для валидации данных
+# city_schema = DetailedCitySchema()
+#
+# # Валидация поштучно
+# for city in json.loads(json_string):
+#     try:
+#         valid_city = city_schema.load(city)
+#         valid_cities.append(valid_city)
+#     except ValidationError as e:
+#         print(e.messages)
+
+# Генерируем json schema на основе схемы marshmallow CitySchema
+# Тут было необходимо добавить () в DetailedCitySchema(), чтобы получить экземпляр класса
+json_schema = JSONSchema().dump(DetailedCitySchema())
+pprint(json_schema)
