@@ -34,6 +34,8 @@ marshmallow_jsonschema - расширение для Marshmallow, которое
 
 - Возможный вариант проверки номеров телефонов - phonenumbers
 """
+from pprint import pprint
+
 from marshmallow import Schema, fields, ValidationError
 
 """
@@ -98,3 +100,23 @@ except ValidationError as e:
 3. Написать схему для валидации данных о фильме (FilmSchema) - самый простой вариант
 4. Валидировать данные о фильмах с помощью FilmSchema(many=True)
 """
+
+from data.marvel import full_dict
+
+films_data: list[dict] = [film for film in full_dict.values()]
+
+class FilmSchema(Schema):
+    title = fields.Str()
+    year = fields.Int()
+    director = fields.Str()
+    screenwriter = fields.Str()
+    producer = fields.Str()
+    stage = fields.Str()
+
+film_schema = FilmSchema(many=True)
+
+try:
+    film_schema.load(films_data)
+except ValidationError as e:
+    pprint(e.messages)
+
