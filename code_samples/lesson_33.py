@@ -70,61 +70,60 @@ from marshmallow import Schema, fields, ValidationError
 
 # Nested schema - вложенная схема
 
-full_dict = {
-    0: {
+full_dict = [
+    {
         'title': 'Железный человек',
         'year': 2008,
         'director': 'Джон Фавро',
-        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
-        'producer': 'Ави Арад и Кевин Файги',
+        'screenwriter': {'names': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
+                         'count': 4},
+        'producer': {'names': ['Ави Арад', 'Кевин Файги'],
+                     'count': 2},
         'stage': 'Первая фаза'
     },
 
-    'Номер 1': {
+    {
         'title': 'Железный человек',
         'year': 2008,
         'director': 'Джон Фавро',
-        'screenwriter': 'Марк Фергус и Хоук Остби, Артур Маркам и Мэтт Холлоуэй',
-        'producer': 'Ави Арад и Кевин Файги',
+        'screenwriter': {'names': ['Марк Фергус', 'Хоук Остби', 'Артур Маркам', 'Мэтт Холлоуэй'],
+                         'count': 4
+                         },
+        'producer': {'names': ['Ави Арад', 'Кевин Файги'],
+                     'count': 2
+                     },
         'stage': 'Первая фаза'
     }
-}
+]
+
+from marshmallow import Schema, fields, ValidationError
+from pprint import pprint
 
 
-class FilmSchema(Schema):
-    title = fields.Str(required=True)
-    year = fields.Int(required=True,
-                      validate=lambda x: 1900 < int(x) < 2022)
-
-    director = fields.Str(required=True)
-    screenwriter = fields.Str(required=True)
-    producer = fields.Str(required=True)
-    stage = fields.Str(required=True)
+# Измененная схема NamesListSchema
+class NamesListSchema(Schema):
+    # Эта схема непосредственно обрабатывает список строк
+    names = fields.List(fields.String(), required=True)
+    # Добавляем новое поле count
+    count = fields.Integer(required=True)
 
 
-"""
-Проверяем ключи в словаре, и вложенной схемой их значения
-"""
+# Измененная схема MovieSchema
+class MovieSchema(Schema):
+    title = fields.String(required=True)
+    year = fields.Integer(required=True)
+    director = fields.String(required=True)
+    screenwriter = fields.Nested(NamesListSchema, required=True)
+    producer = fields.Nested(NamesListSchema, required=True)
+    stage = fields.String(required=True)
 
 
-class FullSchema(Schema):
-    films = fields.Dict(keys=fields.Int(),
-                        values=fields.Nested(FilmSchema))
+# Создаем экземпляр схемы MovieSchema для обработки списка фильмов
+movies_schema = MovieSchema(many=True)
 
-
-# Создаем экземпляр схемы
-full_schema = FullSchema()
-"""
-Когда я предложил использовать {'films': full_dict} в коде, это был способ адаптации ваших данных 
-к ожидаемой структуре FullSchema. В FullSchema, мы определили,
- что есть поле films, которое является словарем с фильмами. 
- 
- Чтобы данные соответствовали этой структуре, мы обернули ваш исходный 
- словарь full_dict в другой словарь с ключом films.
-"""
+# Пытаемся валидировать данные
 try:
-    validated_data = full_schema.load({'films': full_dict})
+    validated_data = movies_schema.load(full_dict)
     pprint(validated_data)
 except ValidationError as e:
     pprint(e.messages)
-
