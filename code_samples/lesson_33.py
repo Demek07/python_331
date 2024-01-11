@@ -90,3 +90,11 @@ try:
     person_schema.load(people_data)
 except ValidationError as e:
     print(e.messages)
+
+# TODO Практика!
+"""
+1. Импортировать marvel full_dict
+2. Создать список словарей (можно через list comprehension) с данными о фильмах
+3. Написать схему для валидации данных о фильме (FilmSchema) - самый простой вариант
+4. Валидировать данные о фильмах с помощью FilmSchema(many=True)
+"""
