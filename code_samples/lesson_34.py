@@ -43,3 +43,81 @@ Lesson 34
 
 Это задание помогает студентам понять, как паттерн "Строитель" может быть применен в реальной ситуации, требующей индивидуальной настройки сложных объектов.
 """
+
+
+class Ceiling:
+    """
+    Класс Потолок. Хранит в себе характеристики потолка.
+    Размер, цвет, материал, количество уровней, наличие светильников, дополнительные опции.
+    """
+
+    def __init__(self):
+        self.size = None
+        self.color = None
+        self.material = None
+        self.levels = None
+        self.lights = None
+        self.extra_options = []
+
+    def __str__(self):
+        return (f"Натяжной потолок: Размер: {self.size}, Цвет: {self.color}, "
+                f"Материал: {self.material}, Уровни: {self.levels}, "
+                f"Светильники: {'есть' if self.lights else 'нет'}, "
+                f"Доп. опции: {', '.join(self.extra_options) or 'нет'}.")
+
+
+class CeilingBuilder:
+    """
+    Класс Строитель Потолков. Содержит методы для создания потолка с определенными характеристиками.
+    """
+
+    def __init__(self):
+        self.ceiling = Ceiling()
+
+    def set_size(self, size):
+        self.ceiling.size = size
+
+    def set_color(self, color):
+        self.ceiling.color = color
+
+    def set_material(self, material):
+        self.ceiling.material = material
+
+    def set_levels(self, levels):
+        self.ceiling.levels = levels
+
+    def set_lights(self, lights):
+        self.ceiling.lights = lights
+
+    def add_extra_option(self, option):
+        self.ceiling.extra_options.append(option)
+
+    def get_ceiling(self):
+        return self.ceiling
+
+
+def main():
+    # Пример использования
+    builder = CeilingBuilder()
+    size = input("Введите размер потолка: ")
+    builder.set_size(size)
+    color = input("Введите цвет потолка: ")
+    builder.set_color(color)
+    material = input("Введите материал потолка: ")
+    builder.set_material(material)
+    levels = input("Введите количество уровней потолка: ")
+    builder.set_levels(levels)
+    lights = input("Введите наличие светильников (да/нет): ")
+    builder.set_lights(lights.lower() == "да")
+    extra_options = input("Введите дополнительные опции (через запятую): ")
+    for option in extra_options.split(","):
+        builder.add_extra_option(option.strip())
+
+    ceiling = builder.get_ceiling()
+
+    print("Ваш потолок:")
+    print(ceiling)
+
+
+if __name__ == "__main__":
+    main()
