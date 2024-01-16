@@ -4,51 +4,75 @@ Lesson 34
 
 - Паттерны проектирования (Порождающие паттерны)
 - Singleton
+- Builder
 """
+from typing import List
 
 
-# Singleton - порождающий паттерн проектирования, который гарантирует, что у класса есть только один экземпляр
-# и предоставляет к нему глобальную точку доступа.
+# Builder - паттерн, который позволяет создавать сложные объекты пошагово
 
-class Singleton:
-    __instance = None
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-
-        return cls.__instance
+class MarkdownDocument:
+    def __init__(self):
+        self.text = ''
 
 
-# тестируем
-s1 = Singleton()
-s2 = Singleton()
+class MarkdownBuilder:
+    def __init__(self):
+        self.document = MarkdownDocument()
 
-print(s1 is s2)
-print(id(s1), id(s2))
+    def add_frontmatter(self, fields) -> None:
+        pass
 
+    def add_header(self, text: str, level: int = 1) -> None:
+        pass
 
-# Реализация логгера с помощью Singleton
+    def add_paragraph(self, text: str) -> None:
+        pass
 
-class Logger:
-    _instance = None  # Статическая переменная для хранения единственного экземпляра
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Logger, cls).__new__(cls)
-            cls._instance.log_file = "log.txt"  # Создаем атрибут для хранения пути к файлу логов
-        return cls._instance
-
-    def log(self, message):
-        with open(self.log_file, "a", encoding="utf-8") as f:
-            f.write(message + "\n")
+    def write(self, file_name: str) -> None:
+        pass
 
 
-# Использование Singleton логгера
-logger1 = Logger()
-logger1.log("Ошибка в приложении")
+# Клиент - код, который использует билдер
+builder = MarkdownBuilder()
+builder.add_header('Заголовок')
+builder.add_paragraph('Параграф')
+builder.add_header('Заголовок 2', 2)
+builder.add_paragraph('Параграф 2')
+builder.write('markdown.md')
 
-logger2 = Logger()  # Получаем тот же самый объект
-logger2.log("Событие в приложении")
 
-print(logger1 is logger2)  # True, это один и тот же объект
+class Burger:
+    def __init__(self):
+        self.ingredients: List[str] = []
+
+    def add_ingredient(self, ingredient: str) -> None:
+        self.ingredients.append(ingredient)
+
+    def __str__(self):
+        return f'Бургер с ингредиентами: {self.ingredients}'
+
+
+class BurgerBuilder:
+    def __init__(self):
+        self.burger = Burger()
+
+    def add_lettuce(self) -> None:
+        self.burger.add_ingredient("салат")
+
+    def add_tomato(self) -> None:
+        self.burger.add_ingredient("помидор")
+
+    def add_cheese(self) -> None:
+        self.burger.add_ingredient("сыр")
+
+    def get_burger(self) -> Burger:
+        return self.burger
+
+
+# Клиентский код
+builder = BurgerBuilder()
+builder.add_cheese()
+builder.add_lettuce()
+burger = builder.get_burger()
+print(burger)
