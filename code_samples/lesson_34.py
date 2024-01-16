@@ -5,74 +5,56 @@ Lesson 34
 - Паттерны проектирования (Порождающие паттерны)
 - Singleton
 - Builder
+- Abstract Factory
 """
-from typing import List
+
+from abc import ABC, abstractmethod
 
 
-# Builder - паттерн, который позволяет создавать сложные объекты пошагово
-
-class MarkdownDocument:
-    def __init__(self):
-        self.text = ''
-
-
-class MarkdownBuilder:
-    def __init__(self):
-        self.document = MarkdownDocument()
-
-    def add_frontmatter(self, fields) -> None:
-        pass
-
-    def add_header(self, text: str, level: int = 1) -> None:
-        pass
-
-    def add_paragraph(self, text: str) -> None:
-        pass
-
-    def write(self, file_name: str) -> None:
+class Button(ABC):
+    @abstractmethod
+    def render(self) -> None:
         pass
 
 
-# Клиент - код, который использует билдер
-builder = MarkdownBuilder()
-builder.add_header('Заголовок')
-builder.add_paragraph('Параграф')
-builder.add_header('Заголовок 2', 2)
-builder.add_paragraph('Параграф 2')
-builder.write('markdown.md')
+class WindowsButton(Button):
+    def render(self) -> None:
+        print("Рендеринг кнопки в стиле Windows")
 
 
-class Burger:
-    def __init__(self):
-        self.ingredients: List[str] = []
-
-    def add_ingredient(self, ingredient: str) -> None:
-        self.ingredients.append(ingredient)
-
-    def __str__(self):
-        return f'Бургер с ингредиентами: {self.ingredients}'
+class MacOSButton(Button):
+    def render(self) -> None:
+        print("Рендеринг кнопки в стиле MacOS")
 
 
-class BurgerBuilder:
-    def __init__(self):
-        self.burger = Burger()
+class GUIFactory(ABC):
+    @abstractmethod
+    def create_button(self) -> Button:
+        pass
 
-    def add_lettuce(self) -> None:
-        self.burger.add_ingredient("салат")
 
-    def add_tomato(self) -> None:
-        self.burger.add_ingredient("помидор")
+class WindowsFactory(GUIFactory):
+    def create_button(self) -> Button:
+        return WindowsButton()
 
-    def add_cheese(self) -> None:
-        self.burger.add_ingredient("сыр")
 
-    def get_burger(self) -> Burger:
-        return self.burger
+class MacOSFactory(GUIFactory):
+    def create_button(self) -> Button:
+        return MacOSButton()
 
 
 # Клиентский код
-builder = BurgerBuilder()
-builder.add_cheese()
-builder.add_lettuce()
-burger = builder.get_burger()
-print(burger)
+def application(factory: GUIFactory) -> None:
+    button = factory.create_button()
+    button.render()
+
+
+# Эмуляция выбора ОС
+current_os = "MacOS"
+if current_os == "Windows":
+    factory = WindowsFactory()
+elif current_os == "MacOS":
+    factory = MacOSFactory()
+
+application(factory)
+
