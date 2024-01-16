@@ -9,90 +9,34 @@ Lesson 34
 - Factory Method
 """
 
+# TODO Практика!
+"""
+### Задание: Построение Натяжных Потолков с Использованием Паттерна "Строитель"
 
-# Factory Method - порождающий паттерн проектирования, который позволяет создавать
-# объекты без указания конкретных классов
+**Цель задания**: Использовать паттерн "Строитель" для разработки системы, которая позволяет пользователю настраивать параметры натяжных потолков.
 
-class Product:
-    def show_info(self):
-        pass
+**Контекст**: Натяжные потолки стали популярным решением для современного дизайна интерьера. Клиенты хотят иметь возможность настраивать размер, цвет, тип материала, наличие встроенных светильников и другие характеристики своего потолка.
 
+**Задача**: Разработать простую систему для создания натяжных потолков, позволяющую клиенту указывать различные характеристики потолка.
 
-class ConcreteProductA(Product):
-    def show_info(self):
-        return "Product A"
+#### Основные Характеристики Натяжного Потолка:
+1. **Размер (Длина и Ширина)**: Размеры потолка в метрах.
+2. **Цвет**: Выбор цвета потолка (например, белый, серый, голубой и т.д.).
+3. **Тип Материала**: Глянцевый, матовый, тканевый, ПВХ и т.д.
+4. **Количество Уровней**: Одноуровневый или многоуровневый потолок.
+5. **Наличие Светильников**: Хотите ли вы встроенные светильники? (да/нет)
+6. **Дополнительные Опции**: Например, фотопечать, звездное небо и т.д.
 
+#### Задачи для Студентов:
+1. **Определение Классов**: Определите классы, необходимые для реализации этой системы с использованием паттерна "Строитель".
+2. **Реализация "Строителя"**: Создайте класс `CeilingBuilder`, который будет "строить" потолок, исходя из заданных пользователем параметров.
+3. **Реализация "Директора"**: Создайте класс `CeilingDirector`, который будет управлять процессом построения, обеспечивая создание потолка с заданными характеристиками.
+4. **Продемонстрируйте Работу Системы**: Напишите простой код для демонстрации, как пользователь может использовать вашу систему для создания натяжного потолка с определенными параметрами.
 
-class ConcreteProductB(Product):
-    def show_info(self):
-        return "Product B"
+**Ограничения**:
+- Время на выполнение задания — 10 минут.
+- Студенты должны сосредоточиться на простоте и чистоте кода.
+- Поощряется творческий подход к определению дополнительных характеристик потолка.
 
-
-class Creator:
-    def factory_method(self):
-        pass
-
-
-class ConcreteCreatorA(Creator):
-    def factory_method(self):
-        return ConcreteProductA()
-
-
-class ConcreteCreatorB(Creator):
-    def factory_method(self):
-        return ConcreteProductB()
-
-
-# Использование фабричного метода
-creator_a = ConcreteCreatorA()
-product_a = creator_a.factory_method()
-print(product_a.show_info())
-
-creator_b = ConcreteCreatorB()
-product_b = creator_b.factory_method()
-print(product_b.show_info())
-
-
-# Пример приближенный к реальности
-# Представим, что у нас есть интернет-магазин, который принимает платежи через PayPal и Stripe
-# Нам нужно реализовать логику обработки платежей через эти два сервиса
-
-class PaymentGateway:
-    def process_payment(self, amount):
-        pass
-
-
-class PayPalPaymentGateway(PaymentGateway):
-    def process_payment(self, amount):
-        # Здесь бы происходила логика обработки платежа через PayPal API
-        return f"Payment of ${amount} processed via PayPal"
-
-
-class StripePaymentGateway(PaymentGateway):
-    def process_payment(self, amount):
-        # Здесь бы происходила логика обработки платежа через Stripe API
-        return f"Payment of ${amount} processed via Stripe"
-
-
-class PaymentGatewayFactory:
-    def create_payment_gateway(self, gateway_type):
-        pass
-
-
-class ConcretePaymentGatewayFactory(PaymentGatewayFactory):
-    def create_payment_gateway(self, gateway_type):
-        if gateway_type == "paypal":
-            return PayPalPaymentGateway()
-        elif gateway_type == "stripe":
-            return StripePaymentGateway()
-        else:
-            raise ValueError("Unsupported payment gateway")
-
-
-# Использование фабричного метода
-payment_gateway_factory = ConcretePaymentGatewayFactory()
-paypal_gateway = payment_gateway_factory.create_payment_gateway("paypal")
-stripe_gateway = payment_gateway_factory.create_payment_gateway("stripe")
-
-print(paypal_gateway.process_payment(100))
-print(stripe_gateway.process_payment(150))
+Это задание помогает студентам понять, как паттерн "Строитель" может быть применен в реальной ситуации, требующей индивидуальной настройки сложных объектов.
+"""
