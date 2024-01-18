@@ -3,52 +3,68 @@ Lesson 35
 18.01.2024
 
 - Паттерны проектирования (Структурные паттерны)
-- Adapter
+- Adapter (адаптер)
+- Facade (фасад)
 """
 
 """
-У нас есть приложение для прогноза погоды, которое изначально разработано для использования 
-с API погодного сервиса A. 
+Паттерн "Фасад" в программировании представляет собой структурный шаблон проектирования, цель которого - предоставление
+ простого интерфейса к сложной системе классов, библиотеке или фреймворку. Основные задачи фасада:
 
-Теперь мы хотим интегрировать API погодного сервиса B, но его интерфейс отличается от API сервиса A.
+- **Упрощение интерфейса**: Скрыть сложность системы, предоставляя простой интерфейс для взаимодействия с ней.
+- **Уменьшение зависимостей**: Снизить зависимость внешнего кода от множества классов в системе, сосредоточив 
+взаимодействие через одну точку доступа.
+
+- **Повышение гибкости**: Облегчить изменение и обновление внутренних компонентов системы, не затрагивая клиентский код.
 """
 
 
-# Исходный сервис (например, старый API)
-class WeatherServiceA:
-    def get_temperature(self):
-        # Возвращаем температуру от сервиса A
-        return "20°C"
+# Подсистема 1: Управление питанием
+class PowerManager:
+    def turn_on(self):
+        return "Питание включено"
+
+    def turn_off(self):
+        return "Питание выключено"
 
 
-# Новый сервис с другим интерфейсом
-class WeatherServiceB:
-    def fetch_weather_info(self):
-        # Возвращаем словарь с информацией о погоде
-        return {"temperature": "18°C", "humidity": "80%"}
+# Подсистема 2: Управление звуком
+class SoundManager:
+    def sound_up(self):
+        return "Звук увеличен"
+
+    def sound_down(self):
+        return "Звук уменьшен"
 
 
-# Целевой интерфейс для нашего приложения
-class WeatherServiceInterface:
-    def get_temperature(self):
-        raise NotImplementedError # raise NotImplementedError - это специальный метод, который говорит, что метод не реализован
+# Подсистема 3: Управление сетью
+class NetworkManager:
+    def connect(self):
+        return "Сеть подключена"
+
+    def disconnect(self):
+        return "Сеть отключена"
 
 
-# Адаптер, преобразующий WeatherServiceB к WeatherServiceInterface
-class WeatherAdapter(WeatherServiceInterface):
-    def __init__(self, service_b):
-        self.service_b = service_b
+# Фасад: Объединяющий интерфейс для подсистем
+class ComputerFacade:
+    def __init__(self):
+        self.power = PowerManager()
+        self.sound = SoundManager()
+        self.network = NetworkManager()
 
-    def get_temperature(self):
-        # Извлекаем температуру из информации, предоставляемой сервисом B
-        weather_info = self.service_b.fetch_weather_info()
-        return weather_info["temperature"]
+    def start_computer(self):
+        return self.power.turn_on(), \
+            self.sound.sound_up(), \
+            self.network.connect()
+
+    def stop_computer(self):
+        return self.network.disconnect(), \
+            self.sound.sound_down(), \
+            self.power.turn_off()
 
 
-# Использование адаптера в приложении
-service_a = WeatherServiceA()
-print(f"Температура от сервиса A: {service_a.get_temperature()}")
-
-service_b = WeatherServiceB()
-adapter_b = WeatherAdapter(service_b)
-print(f"Температура от сервиса B через адаптер: {adapter_b.get_temperature()}")
+# Клиентский код
+facade = ComputerFacade()
+print(facade.start_computer())  # Включение компьютера
+print(facade.stop_computer())  # Выключение компьютера
