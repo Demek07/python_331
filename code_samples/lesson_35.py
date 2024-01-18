@@ -5,72 +5,55 @@ Lesson 35
 - Паттерны проектирования (Структурные паттерны)
 - Adapter (адаптер)
 - Facade (фасад)
+- Composite (композит)
 """
 
 """
-Паттерн "Фасад" в программировании представляет собой структурный шаблон проектирования, цель которого - предоставление
- простого интерфейса к сложной системе классов, библиотеке или фреймворку. Основные задачи фасада:
-
-- **Упрощение интерфейса**: Скрыть сложность системы, предоставляя простой интерфейс для взаимодействия с ней.
-- **Уменьшение зависимостей**: Снизить зависимость внешнего кода от множества классов в системе, сосредоточив 
-взаимодействие через одну точку доступа.
-
-- **Повышение гибкости**: Облегчить изменение и обновление внутренних компонентов системы, не затрагивая клиентский код.
-"""
-
-"""
-Давайте рассмотрим пример паттерна "Фасад" в контексте системы онлайн-бронирования отелей. 
-
-В этой системе может быть несколько сложных компонентов, таких как поиск доступных отелей,
- бронирование номеров и управление платежами. Фасад будет упрощать взаимодействие 
- с этими подсистемами для клиентского кода.
+Паттерн "Компоновщик" используется для построения иерархических структур объектов, 
+где объекты могут быть обработаны одинаковым образом, независимо от того, являются ли они отдельными 
+объектами или составными элементами (композитами).
 """
 
 
-# Подсистема 1: Поиск отелей
-class HotelBookingSystem:
-    @staticmethod
-    def search_hotels(self, date_from, date_to, destination):
-        return f"Найдены отели в {destination} с {date_from} по {date_to}"
+# Базовый класс компонента
+class GraphicComponent:
+    def render(self):
+        raise NotImplementedError
 
 
-# Подсистема 2: Бронирование отелей
-class HotelReservationSystem:
-    @staticmethod
-    def book_hotel(self, hotel_id, date_from, date_to):
-        return f"Отель {hotel_id} забронирован с {date_from} по {date_to}"
+# Лист - Простой графический компонент, например, кнопка
+class Button(GraphicComponent):
+    def render(self):
+        return "Кнопка отрисована"
 
 
-# Подсистема 3: Управление платежами
-class PaymentSystem:
-    @staticmethod
-    def process_payment(self, payment_details):
-        return "Платеж обработан"
+# Лист - Ещё один простой графический компонент, например, текстовое поле
+class TextField(GraphicComponent):
+    def render(self):
+        return "Текстовое поле отрисовано"
 
 
-# Фасад: Упрощенный интерфейс для системы бронирования отелей
-class HotelBookingFacade:
+# Композит - Контейнер для графических компонентов
+class Panel(GraphicComponent):
     def __init__(self):
-        self.hotel_booking = HotelBookingSystem()
-        self.reservation = HotelReservationSystem()
-        self.payment = PaymentSystem()
+        self.children = []
 
-    def book_hotel_for_vacation(self, date_from, date_to, destination, hotel_id, payment_details):
-        available_hotels = self.hotel_booking.search_hotels(date_from, date_to, destination)
-        print(available_hotels)
+    def add(self, component):
+        self.children.append(component)
 
-        reservation_details = self.reservation.book_hotel(hotel_id, date_from, date_to)
-        print(reservation_details)
+    def remove(self, component):
+        self.children.remove(component)
 
-        payment_confirmation = self.payment.process_payment(payment_details)
-        print(payment_confirmation)
-
-        return "Отпуск успешно забронирован!"
+    def render(self):
+        return "Панель с элементами: " + ", ".join(child.render() for child in self.children)
 
 
 # Клиентский код
-facade = HotelBookingFacade()
-vacation = facade.book_hotel_for_vacation("2021-12-24", "2021-12-31", "Майами", "Hotel123", "Visa 1234")
-print(vacation)
+button = Button()
+textField = TextField()
+panel = Panel()
 
+panel.add(button)
+panel.add(textField)
 
+print(panel.render())  # Отрисовка панели с кнопкой и текстовым полем
