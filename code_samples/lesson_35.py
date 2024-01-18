@@ -18,53 +18,59 @@ Lesson 35
 - **Повышение гибкости**: Облегчить изменение и обновление внутренних компонентов системы, не затрагивая клиентский код.
 """
 
+"""
+Давайте рассмотрим пример паттерна "Фасад" в контексте системы онлайн-бронирования отелей. 
 
-# Подсистема 1: Управление питанием
-class PowerManager:
-    def turn_on(self):
-        return "Питание включено"
-
-    def turn_off(self):
-        return "Питание выключено"
-
-
-# Подсистема 2: Управление звуком
-class SoundManager:
-    def sound_up(self):
-        return "Звук увеличен"
-
-    def sound_down(self):
-        return "Звук уменьшен"
+В этой системе может быть несколько сложных компонентов, таких как поиск доступных отелей,
+ бронирование номеров и управление платежами. Фасад будет упрощать взаимодействие 
+ с этими подсистемами для клиентского кода.
+"""
 
 
-# Подсистема 3: Управление сетью
-class NetworkManager:
-    def connect(self):
-        return "Сеть подключена"
-
-    def disconnect(self):
-        return "Сеть отключена"
+# Подсистема 1: Поиск отелей
+class HotelBookingSystem:
+    @staticmethod
+    def search_hotels(self, date_from, date_to, destination):
+        return f"Найдены отели в {destination} с {date_from} по {date_to}"
 
 
-# Фасад: Объединяющий интерфейс для подсистем
-class ComputerFacade:
+# Подсистема 2: Бронирование отелей
+class HotelReservationSystem:
+    @staticmethod
+    def book_hotel(self, hotel_id, date_from, date_to):
+        return f"Отель {hotel_id} забронирован с {date_from} по {date_to}"
+
+
+# Подсистема 3: Управление платежами
+class PaymentSystem:
+    @staticmethod
+    def process_payment(self, payment_details):
+        return "Платеж обработан"
+
+
+# Фасад: Упрощенный интерфейс для системы бронирования отелей
+class HotelBookingFacade:
     def __init__(self):
-        self.power = PowerManager()
-        self.sound = SoundManager()
-        self.network = NetworkManager()
+        self.hotel_booking = HotelBookingSystem()
+        self.reservation = HotelReservationSystem()
+        self.payment = PaymentSystem()
 
-    def start_computer(self):
-        return self.power.turn_on(), \
-            self.sound.sound_up(), \
-            self.network.connect()
+    def book_hotel_for_vacation(self, date_from, date_to, destination, hotel_id, payment_details):
+        available_hotels = self.hotel_booking.search_hotels(date_from, date_to, destination)
+        print(available_hotels)
 
-    def stop_computer(self):
-        return self.network.disconnect(), \
-            self.sound.sound_down(), \
-            self.power.turn_off()
+        reservation_details = self.reservation.book_hotel(hotel_id, date_from, date_to)
+        print(reservation_details)
+
+        payment_confirmation = self.payment.process_payment(payment_details)
+        print(payment_confirmation)
+
+        return "Отпуск успешно забронирован!"
 
 
 # Клиентский код
-facade = ComputerFacade()
-print(facade.start_computer())  # Включение компьютера
-print(facade.stop_computer())  # Выключение компьютера
+facade = HotelBookingFacade()
+vacation = facade.book_hotel_for_vacation("2021-12-24", "2021-12-31", "Майами", "Hotel123", "Visa 1234")
+print(vacation)
+
+
