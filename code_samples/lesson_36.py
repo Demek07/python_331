@@ -5,133 +5,151 @@ Lesson 36
 - Strategy (стратегия)
 - Observer (наблюдатель)
 - Command (команда)
+- State (состояние)
+- Пример взаимодействия паттернов Command + Strategy
 """
 
-from typing import List
+
+class TrafficLightState:
+    """ Абстрактный класс, описывающий состояние светофора """
+
+    def change(self, traffic_light):
+        pass
+
+    def status(self):
+        pass
 
 
-class Command:
-    """
-    Абстрактный класс команды. Определяет интерфейс для выполнения команды.
-    """
+class RedLight(TrafficLightState):
+    """ Конкретное состояние: Красный свет """
 
-    def execute(self):
-        raise NotImplementedError
+    def change(self, traffic_light):
+        traffic_light.state = traffic_light.green
 
-
-class AddCommand(Command):
-    """
-    Конкретная команда для выполнения операции сложения.
-    """
-
-    def __init__(self, a, b):
-        self.a = a
-        self.b = b
-
-    def execute(self):
-        return self.a + self.b
+    def status(self):
+        return "Красный свет"
 
 
-class SubtractCommand(Command):
-    """
-    Конкретная команда для выполнения операции вычитания.
-    """
+class YellowLight(TrafficLightState):
+    """ Конкретное состояние: Желтый свет """
 
-    def __init__(self, a, b):
-        self.a = a
-        self.b = b
+    def change(self, traffic_light):
+        traffic_light.state = traffic_light.red
 
-    def execute(self):
-        return self.a - self.b
+    def status(self):
+        return "Желтый свет"
 
 
-class Calculator:
-    """
-    Инициатор команд, выполняющий команды и возвращающий результат.
-    """
+class GreenLight(TrafficLightState):
+    """ Конкретное состояние: Зеленый свет """
 
-    def execute_command(self, command: Command):
-        return command.execute()
+    def change(self, traffic_light):
+        traffic_light.state = traffic_light.yellow
 
-
-# Клиентский код
-calculator = Calculator()
-commands: List[Command] = [
-    AddCommand(10, 5),  # команда сложения
-    SubtractCommand(10, 5)  # команда вычитания
-]
-
-for cmd in commands:
-    print(f"Результат операции: {calculator.execute_command(cmd)}")
+    def status(self):
+        return "Зеленый свет"
 
 
-class Light:
-    """ Устройство: Свет """
+class TrafficLight:
+    """ Контекст, управляющий состояниями светофора """
 
-    def turn_on(self):
-        return "Свет включен"
+    def __init__(self):
+        self.red = RedLight()
+        self.yellow = YellowLight()
+        self.green = GreenLight()
+        self.state = self.red  # Начальное состояние - красный
 
-    def turn_off(self):
-        return "Свет выключен"
+    def change(self):
+        self.state.change(self)
 
-
-class TV:
-    """ Устройство: Телевизор """
-
-    def turn_on(self):
-        return "Телевизор включен"
-
-    def turn_off(self):
-        return "Телевизор выключен"
-
-
-class Command:
-    """ Интерфейс команды """
-
-    def execute(self):
-        raise NotImplementedError
-
-
-class TurnOnCommand(Command):
-    """ Команда для включения устройства """
-
-    def __init__(self, device):
-        self.device = device
-
-    def execute(self):
-        return self.device.turn_on()
-
-
-class TurnOffCommand(Command):
-    """ Команда для выключения устройства """
-
-    def __init__(self, device):
-        self.device = device
-
-    def execute(self):
-        return self.device.turn_off()
-
-
-class RemoteControl:
-    """ Пульт управления, работающий с командами"""
-
-    def submit(self, command):
-        return command.execute()
+    def status(self):
+        return self.state.status()
 
 
 # Клиентский код
-light = Light()
-tv = TV()
+traffic_light = TrafficLight()
 
-turn_on_light = TurnOnCommand(light)
-turn_off_light = TurnOffCommand(light)
+print(traffic_light.status())  # Красный свет
+traffic_light.change()
+print(traffic_light.status())  # Зеленый свет
+traffic_light.change()
+print(traffic_light.status())  # Желтый свет
 
-turn_on_tv = TurnOnCommand(tv)
-turn_off_tv = TurnOffCommand(tv)
 
-remote = RemoteControl()
+class PlayerState:
+    """ Абстрактный класс для состояний плеера """
 
-print(remote.submit(turn_on_light))  # Включает свет
-print(remote.submit(turn_off_light))  # Выключает свет
-print(remote.submit(turn_on_tv))  # Включает телевизор
-print(remote.submit(turn_off_tv))  # Выключает телевизор
+    def click_play(self, player):
+        pass
+
+    def click_stop(self, player):
+        pass
+
+    def click_pause(self, player):
+        pass
+
+
+class PlayingState(PlayerState):
+    """ Состояние 'Играет' """
+
+    def click_play(self, player):
+        print("Музыка уже играет")
+
+    def click_stop(self, player):
+        print("Остановка музыки")
+        player.state = player.stopped
+
+    def click_pause(self, player):
+        print("Музыка на паузе")
+        player.state = player.paused
+
+
+class StoppedState(PlayerState):
+    """ Состояние 'Остановлен' """
+
+    def click_play(self, player):
+        print("Воспроизведение музыки")
+        player.state = player.playing
+
+    def click_stop(self, player):
+        print("Музыка уже остановлена")
+
+
+class PausedState(PlayerState):
+    """ Состояние 'На паузе' """
+
+    def click_play(self, player):
+        print("Воспроизведение музыки")
+        player.state = player.playing
+
+    def click_stop(self, player):
+        print("Остановка музыки")
+        player.state = player.stopped
+
+
+class MusicPlayer:
+    """ Контекст, управляющий состояниями плеера """
+
+    def __init__(self):
+        self.playing = PlayingState()
+        self.stopped = StoppedState()
+        self.paused = PausedState()
+        self.state = self.stopped  # Начальное состояние - остановлен
+
+    def click_play(self):
+        self.state.click_play(self)
+
+    def click_stop(self):
+        self.state.click_stop(self)
+
+    def click_pause(self):
+        self.state.click_pause(self)
+
+
+# Клиентский код
+player = MusicPlayer()
+
+player.click_play()  # Воспроизведение музыки
+player.click_pause()  # Музыка на паузе
+player.click_play()  # Воспроизведение музыки
+player.click_stop()  # Остановка музыки
