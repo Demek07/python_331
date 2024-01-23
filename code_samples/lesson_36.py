@@ -4,133 +4,134 @@ Lesson 36
 Паттерны поведения
 - Strategy (стратегия)
 - Observer (наблюдатель)
+- Command (команда)
 """
 
+from typing import List
 
-class EventListener:
+
+class Command:
     """
-    Абстрактный интерфейс слушателя событий
+    Абстрактный класс команды. Определяет интерфейс для выполнения команды.
     """
 
-    def notify(self, event):
+    def execute(self):
         raise NotImplementedError
 
 
-class EmailAlertListener(EventListener):
+class AddCommand(Command):
     """
-    Слушатель событий, который отправляет уведомления на электронную почту
-    """
-
-    def notify(self, event):
-        print(f"Отправка уведомления на электронную почту: {event}")
-
-
-class LoggingListener(EventListener):
-    """
-    Слушатель событий, который логирует события
+    Конкретная команда для выполнения операции сложения.
     """
 
-    def notify(self, event):
-        print(f"Логирование события: {event}")
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def execute(self):
+        return self.a + self.b
 
 
-class TelegramAlertListener(EventListener):
+class SubtractCommand(Command):
     """
-    Слушатель событий, который отправляет уведомления в телеграм
-    """
-
-    def notify(self, event):
-        print(f"Отправка уведомления в телеграм: {event}")
-
-
-class EventManager:
-    """
-    Менеджер событий
+    Конкретная команда для выполнения операции вычитания.
     """
 
-    def __init__(self):
-        self.listeners = []
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
 
-    def subscribe(self, listener):
-        """
-        Подписывает слушателя на события
-        :param listener:
-        :return:
-        """
-        self.listeners.append(listener)
-
-    def unsubscribe(self, listener):
-        """
-        Отписывает слушателя от событий
-        :param listener:
-        :return:
-        """
-        self.listeners.remove(listener)
-
-    def notify(self, event):
-        """
-        Уведомляет всех подписчиков о событии
-        :param event:
-        :return:
-        """
-        [listener.notify(event) for listener in self.listeners]
+    def execute(self):
+        return self.a - self.b
 
 
-# Пример использования
-event_manager = EventManager()  # создаем экземпляр менеджера событий для управления подписками
-email_listener = EmailAlertListener()  # создаем слушателя событий для отправки уведомлений на почту
-logging_listener = LoggingListener()  # создаем слушателя событий для логирования событий
-telegram_listener = TelegramAlertListener()  # создаем слушателя событий для отправки уведомлений в телеграм
+class Calculator:
+    """
+    Инициатор команд, выполняющий команды и возвращающий результат.
+    """
 
-event_manager.subscribe(email_listener)  # подписываем слушателя на события
-event_manager.subscribe(logging_listener)  # подписываем слушателя на события
-event_manager.subscribe(telegram_listener)  # подписываем слушателя на события
-
-event_manager.notify("Пользователь вошел в систему")  # отправляем событие всем подписчикам
-
-event_manager.unsubscribe(email_listener)  # отписываем слушателя от событий
-event_manager.notify("Пользователь вышел из системы")  # отправляем событие всем подписчикам
+    def execute_command(self, command: Command):
+        return command.execute()
 
 
-# Абстрактный пример
-class Observer:
-    def update(self, message):
+# Клиентский код
+calculator = Calculator()
+commands: List[Command] = [
+    AddCommand(10, 5),  # команда сложения
+    SubtractCommand(10, 5)  # команда вычитания
+]
+
+for cmd in commands:
+    print(f"Результат операции: {calculator.execute_command(cmd)}")
+
+
+class Light:
+    """ Устройство: Свет """
+
+    def turn_on(self):
+        return "Свет включен"
+
+    def turn_off(self):
+        return "Свет выключен"
+
+
+class TV:
+    """ Устройство: Телевизор """
+
+    def turn_on(self):
+        return "Телевизор включен"
+
+    def turn_off(self):
+        return "Телевизор выключен"
+
+
+class Command:
+    """ Интерфейс команды """
+
+    def execute(self):
         raise NotImplementedError
 
 
-class ConcreteObserverA(Observer):
-    def update(self, message):
-        print(f"ConcreteObserverA получил {message}")
+class TurnOnCommand(Command):
+    """ Команда для включения устройства """
+
+    def __init__(self, device):
+        self.device = device
+
+    def execute(self):
+        return self.device.turn_on()
 
 
-class ConcreteObserverB(Observer):
-    def update(self, message):
-        print(f"ConcreteObserverB получил {message}")
+class TurnOffCommand(Command):
+    """ Команда для выключения устройства """
+
+    def __init__(self, device):
+        self.device = device
+
+    def execute(self):
+        return self.device.turn_off()
 
 
-class Subject:
-    def __init__(self):
-        self._observers = []
+class RemoteControl:
+    """ Пульт управления, работающий с командами"""
 
-    def register(self, observer):
-        self._observers.append(observer)
-
-    def unregister(self, observer):
-        self._observers.remove(observer)
-
-    def notify_observers(self, message):
-        for observer in self._observers:
-            observer.update(message)
+    def submit(self, command):
+        return command.execute()
 
 
-# Пример использования
-subject = Subject()
-observer_a = ConcreteObserverA()
-observer_b = ConcreteObserverB()
+# Клиентский код
+light = Light()
+tv = TV()
 
-subject.register(observer_a)
-subject.register(observer_b)
-subject.notify_observers("Событие 1")
+turn_on_light = TurnOnCommand(light)
+turn_off_light = TurnOffCommand(light)
 
-subject.unregister(observer_a)
-subject.notify_observers("Событие 2")
+turn_on_tv = TurnOnCommand(tv)
+turn_off_tv = TurnOffCommand(tv)
+
+remote = RemoteControl()
+
+print(remote.submit(turn_on_light))  # Включает свет
+print(remote.submit(turn_off_light))  # Выключает свет
+print(remote.submit(turn_on_tv))  # Включает телевизор
+print(remote.submit(turn_off_tv))  # Выключает телевизор
