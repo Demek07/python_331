@@ -80,13 +80,13 @@ class PlayerState:
     """ Абстрактный класс для состояний плеера """
 
     def click_play(self, player):
-        pass
+        raise NotImplementedError
 
     def click_stop(self, player):
-        pass
+        raise NotImplementedError
 
     def click_pause(self, player):
-        pass
+        raise NotImplementedError
 
 
 class PlayingState(PlayerState):
