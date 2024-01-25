@@ -4,85 +4,127 @@ Lesson 37
 Паттерны поведения
 - Генераторы
 - Понятие итератора
-- Iterator (итератор)
-"""
-from time import sleep
-
-# Однострочный генератор чисел до 3
-gen = (i for i in range(3))
-# print(len(gen)) # TypeError: object of type 'generator' has no len()
-# next() - возвращает следующий элемент генератора
-
-while True:
-    try:
-        print(next(gen))
-    except StopIteration:
-        print("Генератор закончил работу")
-        break
-
-
-# All - возвращает True, если все элементы истинны
-# Any - возвращает True, если хотя бы один элемент истинный
-
-list_1 = [1, 1, 1, 0]
-list_2 = [1, 1, 1, 1]
-list_3 = [0, 0, 0, 0]
-
-print(all(list_1))  # False
-print(all(list_2))  # True
-print(not all(list_3))  # True (not False = True)
-print(any(list_1))  # True
-print(any(list_3))  # False
-
-list_letters = ["a", "b", "c", "1"]
-# is alpha - проверяет, что строка состоит только из букв
-# comprihension - списковое включение
-print(all([letter.isalpha() for letter in list_letters]))  # False
-
-# Генератор
-print(all(letter.isalpha() for letter in list_letters))  # False
-
-# Any
-print(any(letter.isalpha() for letter in list_letters))  # True
-
-# Поищем в списке list_letters "b"
-print(any(letter.lower() == "b" for letter in list_letters))  # True
-
-# TODO Практика - реализовать функцию any
-"""
-Опишите функцию генератор чтения файлов построчно.
-Запросите у пользователя поисковое слово.
-Через any() проверьте есть ли в файле строка (приведите к нижнему регистру) - "поисковое слово"
-Если есть - выведите "поисковое слово", если нет - "поисковое слово"
+- All и Any
+- Итеративное чтение больших файлов
+- Итеративный поиск по большому файлу
+- Паттерн Iterator (итератор)
 """
 
-# Решение практики
-# Генератор для построчного чтения txt файла
+
+# Итератор который будет создавать и возвращать только четные числа от 0 до n
+
+class EvenIterator:
+    """
+    Тут нет метода __iter__ который возвращает сам итератор
+    Поэтому мы не сможем использовать наш итератор в цикле for
+    Однако мы можем использовать это в цикле while через next()
+    """
+    def __init__(self, n):
+        self.n = n
+        self.current = 0
+
+    def __next__(self):
+        if self.current < self.n:
+            self.current += 2
+            return self.current
+        else:
+            raise StopIteration
+
+
+# Тестируем наш итератор
+even_iterator = EvenIterator(10)
+print(next(even_iterator))
+print(next(even_iterator))
+print(next(even_iterator))
+
+even_iterator_2 = EvenIterator(15)
+
+
+# EvenIterator2 имеющий метод __iter__ который возвращает сам итератор
+class EvenIterator2:
+    def __init__(self, n):
+        """
+        На инициализацию принимает число n, до которого будет возвращать четные числа
+        :param n:
+        """
+        self.n = n
+        self.current = 0
+
+    def __iter__(self):
+        """
+        Метод __iter__ возвращает сам итератор
+        Без него мы не сможем использовать наш итератор в цикле for
+        :return:
+        """
+        return self
+
+    def __next__(self):
+        """
+        Метод __next__ возвращает следующее четное число
+        Тут мы явно описываем то, что должен делать наш итератор
+        Само возвращаемое значение и условие остановки итератора
+        :return:
+        """
+        if self.current < self.n:
+            self.current += 2
+            return self.current
+        else:
+            raise StopIteration
+
+
+# Тестируем наш итератор
+even_iterator = EvenIterator2(10)
+for i in even_iterator:
+    print(i)
+
+
 txt_file_path = "../data/generator_text.txt"
 
+# Опишем класс итеративного чтения файла
 
-def read_lines_file(file_path):
-    with open(file_path, "r", encoding='utf-8') as file:
-        for line in file:
-            yield line.strip()
+class TxtFileIterator:
+    """
+    Класс итеративного чтения файла
+    """
+    def __init__(self, file_path):
+        """
+        На инициализацию принимает путь к файлу
+        :param file_path:
+        """
+        self.file_path = file_path
+        self.file = None
+
+    def __iter__(self):
+        """
+        Метод __iter__ возвращает сам итератор
+        Без него мы не сможем использовать наш итератор в цикле for
+        :return:
+        """
+        return self
+
+    def __next__(self):
+        """
+        Метод __next__ возвращает следующую строку из файла
+        Тут мы явно описываем то, что должен делать наш итератор
+        Само возвращаемое значение и условие остановки итератора
+        :return:
+        """
+        if self.file is None:
+            self.file = open(self.file_path, "r", encoding="utf8")
+        line = self.file.readline()
+        if line:
+            return line.strip()
+        else:
+            self.file.close()
+            raise StopIteration
 
 
-generator = read_lines_file(txt_file_path)
+# Тестируем наш итератор
+txt_file_iterator = TxtFileIterator(txt_file_path)
+while True:
+    try:
+        print(next(txt_file_iterator))
+    except StopIteration:
+        print("Итератор закончил работу")
+        break
 
-# Поиск слова в файле
-search_word = input("Введите слово для поиска: ")
-result = any(search_word.lower() in line.lower() for line in generator)
-if result:
-    print(f"Слово '{search_word}' найдено в файле")
-else:
-    print(f"Слово '{search_word}' не найдено в файле")
-
-# А если нам нужно поискать и вывести все строки, в которых есть искомое слово?
-# Тогда нам нужно использовать функцию filter()
-# Filter - фильтрует элементы по условию
-# Возвращает объект-генератор
-
-result = filter(lambda line: search_word.lower() in line.lower(), read_lines_file(txt_file_path))
-print(list(result))
-
-# В полном виде
