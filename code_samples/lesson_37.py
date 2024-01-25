@@ -8,123 +8,113 @@ Lesson 37
 - Итеративное чтение больших файлов
 - Итеративный поиск по большому файлу
 - Паттерн Iterator (итератор)
+- Паттерн MVC (Model-View-Controller)
 """
 
 
-# Итератор который будет создавать и возвращать только четные числа от 0 до n
+class UserModel:
+    def __init__(self, user_data: dict):
+        self.user_data = user_data
 
-class EvenIterator:
-    """
-    Тут нет метода __iter__ который возвращает сам итератор
-    Поэтому мы не сможем использовать наш итератор в цикле for
-    Однако мы можем использовать это в цикле while через next()
-    """
-    def __init__(self, n):
-        self.n = n
-        self.current = 0
+    def get_user_data(self):
+        return self.user_data
 
-    def __next__(self):
-        if self.current < self.n:
-            self.current += 2
-            return self.current
-        else:
-            raise StopIteration
+    def set_user_data(self, user_data: dict):
+        self.user_data = user_data
 
 
-# Тестируем наш итератор
-even_iterator = EvenIterator(10)
-print(next(even_iterator))
-print(next(even_iterator))
-print(next(even_iterator))
-
-even_iterator_2 = EvenIterator(15)
+class UserView:
+    def display_user_data(self, user_data: dict):
+        print("User Data:")
+        for key, value in user_data.items():
+            print(f"{key}: {value}")
 
 
-# EvenIterator2 имеющий метод __iter__ который возвращает сам итератор
-class EvenIterator2:
-    def __init__(self, n):
-        """
-        На инициализацию принимает число n, до которого будет возвращать четные числа
-        :param n:
-        """
-        self.n = n
-        self.current = 0
+class UserController:
+    def __init__(self, model: UserModel, view: UserView):
+        self.model = model
+        self.view = view
 
-    def __iter__(self):
-        """
-        Метод __iter__ возвращает сам итератор
-        Без него мы не сможем использовать наш итератор в цикле for
-        :return:
-        """
-        return self
+    def update_view(self):
+        user_data = self.model.get_user_data()
+        self.view.display_user_data(user_data)
 
-    def __next__(self):
-        """
-        Метод __next__ возвращает следующее четное число
-        Тут мы явно описываем то, что должен делать наш итератор
-        Само возвращаемое значение и условие остановки итератора
-        :return:
-        """
-        if self.current < self.n:
-            self.current += 2
-            return self.current
-        else:
-            raise StopIteration
+    def set_user_data(self, user_data: dict):
+        self.model.set_user_data(user_data)
 
 
-# Тестируем наш итератор
-even_iterator = EvenIterator2(10)
-for i in even_iterator:
-    print(i)
+# Использование
+def main():
+    user_data = {'name': 'Alice', 'age': 30}
+    model = UserModel(user_data)
+    view = UserView()
+    controller = UserController(model, view)
+
+    controller.update_view()
+
+    # Изменение данных пользователя
+    controller.set_user_data({'name': 'Bob', 'age': 35})
+    controller.update_view()
 
 
-txt_file_path = "../data/generator_text.txt"
+if __name__ == "__main__":
+    main()
 
-# Опишем класс итеративного чтения файла
 
-class TxtFileIterator:
-    """
-    Класс итеративного чтения файла
-    """
+"""
+Опишем модель Город (читаем JSON файл с данными о городах):
+Опишем модель Представление (Красивый вывод данных):
+Опишем модель Контроллер (Обработка данных):
+- Проверка прав доступа
+"""
+
+import json
+
+class CityModel:
     def __init__(self, file_path):
-        """
-        На инициализацию принимает путь к файлу
-        :param file_path:
-        """
         self.file_path = file_path
-        self.file = None
 
-    def __iter__(self):
-        """
-        Метод __iter__ возвращает сам итератор
-        Без него мы не сможем использовать наш итератор в цикле for
-        :return:
-        """
-        return self
+    def load_data(self):
+        with open(self.file_path, 'r') as file:
+            return json.load(file)
 
-    def __next__(self):
-        """
-        Метод __next__ возвращает следующую строку из файла
-        Тут мы явно описываем то, что должен делать наш итератор
-        Само возвращаемое значение и условие остановки итератора
-        :return:
-        """
-        if self.file is None:
-            self.file = open(self.file_path, "r", encoding="utf8")
-        line = self.file.readline()
-        if line:
-            return line.strip()
-        else:
-            self.file.close()
-            raise StopIteration
+    def save_data(self, data):
+        with open(self.file_path, 'w') as file:
+            json.dump(data, file, indent=4)
 
+    # Добавьте здесь методы для CRUD операций
 
-# Тестируем наш итератор
-txt_file_iterator = TxtFileIterator(txt_file_path)
-while True:
-    try:
-        print(next(txt_file_iterator))
-    except StopIteration:
-        print("Итератор закончил работу")
-        break
+from tabulate import tabulate
 
+class CityView:
+    def display_cities(self, students):
+        print(tabulate(students, headers="keys"))
+
+    def display_message(self, message):
+        print(message)
+
+    # Дополнительные методы для интерактивного взаимодействия с пользователем
+
+class CityController:
+    def __init__(self, model, view):
+        self.model = model
+        self.view = view
+
+    def display_cities(self):
+        students = self.model.load_data()
+        self.view.display_cities(students)
+
+    # Методы для обработки пользовательского ввода и вызова соответствующих методов модели
+
+def main():
+    model = CityModel('cities.json') # Путь к файлу с данными указать более точный
+    view = CityView()
+    controller = CityController(model, view)
+
+    controller.display_cities()
+
+    # Здесь будет реализация взаимодействия с пользователем
+    # Например, отображение меню и обработка команд
+
+if __name__ == "__main__":
+    main()
