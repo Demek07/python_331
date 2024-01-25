@@ -55,3 +55,34 @@ print(any(letter.lower() == "b" for letter in list_letters))  # True
 Через any() проверьте есть ли в файле строка (приведите к нижнему регистру) - "поисковое слово"
 Если есть - выведите "поисковое слово", если нет - "поисковое слово"
 """
+
+# Решение практики
+# Генератор для построчного чтения txt файла
+txt_file_path = "../data/generator_text.txt"
+
+
+def read_lines_file(file_path):
+    with open(file_path, "r", encoding='utf-8') as file:
+        for line in file:
+            yield line.strip()
+
+
+generator = read_lines_file(txt_file_path)
+
+# Поиск слова в файле
+search_word = input("Введите слово для поиска: ")
+result = any(search_word.lower() in line.lower() for line in generator)
+if result:
+    print(f"Слово '{search_word}' найдено в файле")
+else:
+    print(f"Слово '{search_word}' не найдено в файле")
+
+# А если нам нужно поискать и вывести все строки, в которых есть искомое слово?
+# Тогда нам нужно использовать функцию filter()
+# Filter - фильтрует элементы по условию
+# Возвращает объект-генератор
+
+result = filter(lambda line: search_word.lower() in line.lower(), read_lines_file(txt_file_path))
+print(list(result))
+
+# В полном виде
