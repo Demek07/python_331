@@ -102,7 +102,7 @@ def test_zero_division():
 import json
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def cities():
     with open(r'C:\Users\user\Syncthing\Работа\Academy_Top\ПРИМЕРЫ КОДА\python_331\data\cities.json', 'r', encoding='utf-8') as f:
         cities = json.load(f)
