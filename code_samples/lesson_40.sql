@@ -51,3 +51,33 @@ SELECT name, SEX, year
 FROM MarvelCharacters
 WHERE YEAR != 1962 AND SEX NOT null
 ORDER BY year
+
+-- YEAR < 1944
+-- Кроме = != AND NOT OR можно использовать < > <= >=
+-- ORDER BY DESC - сортировка по убыванию
+SELECT name, SEX, year
+FROM MarvelCharacters
+WHERE YEAR < 1944 AND SEX NOT null
+ORDER BY year DESC
+
+-- Поставим столбцы так как удобно нам, год, имя, пол
+-- сделаем сортировку по году, полу по убыванию и имени
+SELECT year, name, sex
+FROM MarvelCharacters
+WHERE YEAR < 1944 AND SEX NOT null
+ORDER BY year, SEX DESC, name
+
+-- Добавим псевдонимы для столбцов
+-- Псевдонимы пишутся после названия столбца через пробел
+SELECT year as 'Год', name as 'Имя', SEX as 'Пол'
+FROM MarvelCharacters
+WHERE YEAR < 1944 AND SEX NOT null
+ORDER BY year, SEX DESC, name
+
+-- TOOD: практика!
+-- имя, год появления количество появлений девушки блондинки с голубыми глазами
+-- Blond Hair, Blue Eyes сортировка по году, и по количеству появлений
+
+
+-- Лысые злодеи! Bad Characters ALIGN и Bald Hair
+-- Сортировка по имени по возрастанию
