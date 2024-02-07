@@ -1,6 +1,7 @@
 -- Lesson 40
 -- 06.02.2024
--- SELECT, FROM, WHERE, ORDER BY,
+-- SELECT, FROM, WHERE, (AND, OR, NOT = != < > <= >=),
+-- ORDER BY, (ASC, DESC, несколько столбцов),
 -- IN, BETWEEN, LIKE,
 -- LIMIT, OFFSET
 -- Структура таблицы Marvel
@@ -131,3 +132,11 @@ SELECT DISTINCT SEX FROM MarvelCharacters
 
 SELECT DISTINCT EYE FROM MarvelCharacters
 LIMIT 5 OFFSET 10
+
+-- LIKE - поиск по шаблону
+-- % - любое количество символов
+-- _ - один символ
+-- Ищем имена начинающиеся на Cap
+SELECT name
+FROM MarvelCharacters
+WHERE name LIKE 'Sar%'
