@@ -12,7 +12,7 @@ from pprint import pprint
 import requests
 from dataclasses import dataclass
 from marshmallow import Schema, fields, ValidationError, post_load, INCLUDE
-from marshmallow_jsonschema import JSONSchema
+from marshmallow_jsonschema import JSONSchema # pip install marshmallow-jsonschema
 
 
 def get_weather(city_name: str) -> dict:
