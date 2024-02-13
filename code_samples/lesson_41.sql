@@ -131,3 +131,27 @@ WHERE appearances > (
 SELECT AVG(appearances) * 100
 FROM MarvelCharacters
 );
+
+-- Подзапрос возвращает цвета глаз, у которых количество персонажей меньше 5
+SELECT name, EYE
+FROM MarvelCharacters
+WHERE EYE IN (
+    SELECT EYE
+    FROM MarvelCharacters
+    GROUP BY EYE
+    HAVING COUNT(*) < 5
+);
+
+-- Новая таблица
+-- id primary key, autoincrement
+-- message text not null
+-- datetimestamp default current_timestamp sqlite
+
+CREATE TABLE messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT NOT NULL,
+    datetimestamp DEFAULT CURRENT_TIMESTAMP -- Текущая дата, время в момент вставки часовой пояс UTC
+);
+
+-- Вставим новое сообщение
+INSERT INTO messages (message) VALUES ('Hello, world!');
