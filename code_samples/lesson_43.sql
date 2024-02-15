@@ -153,9 +153,29 @@ JOIN Passports ON Students.passport_id = Passports.id;
 BEGIN TRANSACTION;
 
 INSERT INTO Passports (series_number, date_of_issue, department)
-VALUES ('1234 567890', '2020-01-01', 'Отделение №1');
+VALUES ('4321 123456', '2020-01-01', 'Отделение №1');
 
 INSERT INTO Students (name, passport_id)
-VALUES ('Иванов Иван Иванович', (SELECT id FROM Passports WHERE series_number = '1234 567890'));
+VALUES ('Николаева Анна Степановна', (SELECT id FROM Passports WHERE series_number = '4321 123456'));
 
 COMMIT;
+
+-- Поменяем паспортные данные Анны, найдя её по имени, по id паспорта, и изменим номер паспорта на '4321 654321'
+UPDATE Passports
+SET series_number = '4321 654321'
+WHERE id = (SELECT passport_id FROM Students WHERE name = 'Николаева Анна Степановна');
+
+-- Поменяем фамилию Анны (вышла замуж), найдя её по номеру паспорта в нашей базе
+UPDATE Students
+SET name = 'Степанова Анна Петровна'
+WHERE passport_id = (SELECT id FROM Passports WHERE series_number = '4321 654321');
+
+-- Виртуальная таблица - VIEW
+-- Создадим виртуальную таблицу, которая будет содержать имена студентов и их паспортные данные
+CREATE VIEW StudentsPassports AS
+SELECT Students.name AS Студент, Passports.series_number AS Паспорт
+FROM Students
+JOIN Passports ON Students.passport_id = Passports.id;
+
+-- Выведем содержимое виртуальной таблицы
+SELECT * FROM StudentsPassports;
