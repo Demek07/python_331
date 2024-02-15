@@ -257,4 +257,46 @@ INSERT INTO Faculties (name, director)
 VALUES ('Без факультета', 'Неизвестно');
 
 
---
+-- Проверяем версию с Null
+
+CREATE TABLE Faculties (
+name TEXT PRIMARY KEY,
+director TEXT NOT NULL
+);
+
+CREATE TABLE Students (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+faculty TEXT DEFAULT NULL,
+name TEXT NOT NULL,
+FOREIGN KEY (faculty) REFERENCES Faculties(name) ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+DELETE FROM Faculties
+WHERE name = 'Факультет Экономики';
+
+-- Многие ко многим - Many to Many
+CREATE TABLE Students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+    -- Другие поля, связанные со студентом
+);
+
+CREATE TABLE Teachers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+    -- Другие поля, связанные с учителем
+);
+
+CREATE TABLE StudentsTeachers (
+    student_id INTEGER,
+    teachers_id INTEGER,
+    PRIMARY KEY (student_id, teachers_id),
+    FOREIGN KEY (student_id) REFERENCES Students (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+    FOREIGN KEY (teachers_id) REFERENCES Teachers (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
+);
