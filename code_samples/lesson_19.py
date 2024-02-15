@@ -227,7 +227,7 @@ def some_func3(name: str) -> None:
 some_func3("Матвей") # TypeError: wrapper() takes 0 positional arguments but 1 was given
 
 
-Частный случай. Но не универсальный.
+# Частный случай. Но не универсальный.
 def print_decorator2(func: Callable) -> Callable:
     def wrapper(name: str) -> None:
         print("Start")
