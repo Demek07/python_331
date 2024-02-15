@@ -67,3 +67,47 @@ RIGHT JOIN Shops ON Cats.shop_id = Shops.id;
 SELECT Cats.name AS Котик, Shops.name AS Магазин
 FROM Cats
 FULL JOIN Shops ON Cats.shop_id = Shops.id;
+
+-- Модифицируем эти таблицы
+-- Добавим первичные ключи и внешний ключ
+
+-- Удалим таблицы
+DROP TABLE Cats;
+DROP TABLE Shops;
+
+
+CREATE TABLE Cats (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT,
+shop_id INTEGER
+FOREIGN KEY (shop_id) REFERENCES Shops(id)
+);
+
+-- Сделаем таблицу с магазинами
+-- id, name
+CREATE TABLE Shops (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT
+);
+
+INSERT INTO Cats (name, shop_id)
+VALUES ('Мурзик', 1),
+('Барсик', 1),
+('Матроскин', 2),
+('Булочка', 2),
+('Батон', 10);
+
+INSERT INTO Shops (name)
+VALUES ('Зоомагазин Усы и хвост'),
+('Зоомагазин Зоомир'),
+('Зоомагазин Котомир'),
+('Зоомагазин Золотая рыбка'),
+('Зоомагазин Котопес');
+
+-- Добавим котика Маффин в магазин Зоомагазин Золотая рыбка так, чтобы ID добылся автоматически
+INSERT INTO Cats (name, shop_id)
+VALUES ('Маффин', (
+    SELECT id
+    FROM Shops
+    WHERE name = 'Зоомагазин Золотая рыбка')
+);
