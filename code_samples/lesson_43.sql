@@ -111,3 +111,51 @@ VALUES ('Маффин', (
     FROM Shops
     WHERE name = 'Зоомагазин Золотая рыбка')
 );
+
+-------------------------------------------------------
+-------------------------------------------------------
+-- Отношения между таблицами
+-- Один ко многим - One to Many - КОгда один объект в одной таблице связан с несколькими объектами в другой таблице
+-- Один ко одному - One to One - Когда один объект в одной таблице связан с одним объектом в другой таблице
+-- Многие ко многим - Many to Many - Когда несколько объектов в одной таблице связаны с несколькими объектами в другой таблице
+
+-- Пример ВУЗа. Студенты - Паспорта. Один студент - один паспорт. Один паспорт - один студент.
+-- One to One
+
+CREATE TABLE Students (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+passport_id INTEGER NOT NULL UNIQUE,
+name TEXT NOT NULL,
+FOREIGN KEY (passport_id) REFERENCES Passports(id)
+);
+
+CREATE TABLE Passports (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+series_number TEXT NOT NULL UNIQUE,
+date_of_issue TEXT NOT NULL,
+department TEXT NOT NULL
+);
+
+-- Добавим паспорт
+INSERT INTO Passports (series_number, date_of_issue, department)
+VALUES ('1234 567890', '01.01.2000', 'Отделение УФМС по г. Москва');
+
+-- Добавим студента
+INSERT INTO Students (passport_id, name)
+VALUES (1, 'Иванов Иван Иванович');
+
+-- Читаем студента и его паспорт
+SELECT Students.name AS Студент, Passports.series_number AS Паспорт
+FROM Students
+JOIN Passports ON Students.passport_id = Passports.id;
+
+
+BEGIN TRANSACTION;
+
+INSERT INTO Passports (series_number, date_of_issue, department)
+VALUES ('1234 567890', '2020-01-01', 'Отделение №1');
+
+INSERT INTO Students (name, passport_id)
+VALUES ('Иванов Иван Иванович', (SELECT id FROM Passports WHERE series_number = '1234 567890'));
+
+COMMIT;
