@@ -38,3 +38,32 @@ VALUES (1, 'Зоомагазин Усы и хвост'),
 
 -- Выведем всех котиков
 select * from cats;
+
+-- Выведем всех котиков + названия магазинов
+-- JOIN - объединение таблиц
+-- Аналогично INNER JOIN
+SELECT Cats.name AS Котик, Shops.name AS Магазин
+FROM Cats, Shops
+WHERE Cats.shop_id = Shops.id;
+
+-- JOIN - по-умолчанию = INNER JOIN
+-- INNER JOIN - внутреннее объединение - Даст ВСЕХ котиков, у которых есть магазин
+SELECT Cats.name AS Котик, Shops.name AS Магазин
+FROM Cats
+INNER JOIN Shops ON Cats.shop_id = Shops.id;
+
+
+-- LEFT JOIN - левое объединение - Даст ВСЕХ котиков, даже тех, у кого нет магазина
+SELECT Cats.name AS Котик, Shops.name AS Магазин
+FROM Cats
+LEFT JOIN Shops ON Cats.shop_id = Shops.id;
+
+-- RIGHT JOIN - правое объединение - Даст ВСЕ магазины, даже те, в которых нет котиков
+SELECT Cats.name AS Котик, Shops.name AS Магазин
+FROM Cats
+RIGHT JOIN Shops ON Cats.shop_id = Shops.id;
+
+-- FULL JOIN - полное объединение - Даст ВСЕХ котиков и ВСЕ магазины
+SELECT Cats.name AS Котик, Shops.name AS Магазин
+FROM Cats
+FULL JOIN Shops ON Cats.shop_id = Shops.id;
