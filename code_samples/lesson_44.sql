@@ -42,33 +42,67 @@ CREATE TABLE StudentsTeachers (
 INSERT INTO Students (name, last_name)
 VALUES ('Иван', 'Николаев'),
        ('Петр', 'Сидоров'),
-       ('Сидор', 'Петров');
-       ('Анна', 'Иванова');
-       ('Светлана', 'Никифорова');
+       ('Сидор', 'Петров'),
+       ('Анна', 'Иванова'),
+       ('Светлана', 'Никифорова'),
        ('Дарья', 'Леонтьева');
 
 -- Добавим учителей
 INSERT INTO Teachers (name, last_name)
 VALUES ('Сигимунд', 'Фрейд'),
        ('Карл', 'Ясперс'),
-       ('Мартин', 'Хайдеггер');
-       ('Фридрих', 'Ницше');
-       ('Альберт', 'Камю');
+       ('Мартин', 'Хайдеггер'),
+       ('Фридрих', 'Ницше'),
+       ('Альберт', 'Камю'),
        ('Жан-Поль', 'Сартр');
 
 -- Добавим связи.
 -- Что в нашем случае они будут представлять?
 -- Вероятно проведенное занятие!
 
---INSERT INTO StudentsTeachers (student_id, teachers_id)
---VALUES (1, 1),
---       (2, 2),
---       (3, 3),
---       (4, 4),
---       (5, 5),
---       (6, 6);
+INSERT INTO StudentsTeachers (student_id, teachers_id)
+VALUES (1, 1),
+       (2, 2),
+       (3, 3),
+       (4, 4),
+       (5, 5),
+       (6, 6);
 
 -- Добавим одну запись, найдя данные по имени и фамилии студента, и имени и фамилии препода
 INSERT INTO StudentsTeachers (student_id, teachers_id)
-VALUES ((SELECT id FROM Students WHERE name = 'Иван' AND last_name = 'Николаев'),
-        (SELECT id FROM Teachers WHERE name = 'Сигимунд' AND last_name = 'Фрейд'));
+VALUES ((SELECT id FROM Students WHERE name = 'Светлана' AND last_name = 'Никифорова'),
+        (SELECT id FROM Teachers WHERE name = 'Фридрих' AND last_name = 'Ницше'));
+
+
+-- Давайте выполним запрос и получим имена  и фамилии студентов и их учителей
+SELECT Students.name AS Имя_студента, Students.last_name AS Фамилия_студента,
+       Teachers.name AS Имя_препода, Teachers.last_name AS Фамилия_препода
+FROM Students
+JOIN StudentsTeachers ON Students.id = StudentsTeachers.student_id
+JOIN Teachers ON Teachers.id = StudentsTeachers.teachers_id;
+
+-- Добавим еще одного препода
+INSERT INTO Teachers (name, last_name)
+VALUES ('Карл', 'Густав Юнг');
+
+-- Сидор Петров учился у Карла Густава Юнга
+INSERT INTO StudentsTeachers (student_id, teachers_id)
+VALUES ((SELECT id FROM Students WHERE name = 'Сидор' AND last_name = 'Петров'),
+        (SELECT id FROM Teachers WHERE name = 'Карл' AND last_name = 'Густав Юнг'));
+
+-- Студенты, у которых не преподавал юнг (имена и фамилии)
+-- Выбираем из таблицы Students имя, фамилию студента
+SELECT Students.name AS Имя_студента, Students.last_name AS Фамилия_студента
+FROM Students
+-- Где ID студента не входит в следующее выражение
+WHERE Students.id NOT IN  -- Если убрать NOT, то получим студентов, у которых преподавал Юнг
+    -- Выбираем из таблицы StudentsTeachers ID студента, где ID препода равен следующему выражению
+    (SELECT student_id
+    FROM StudentsTeachers
+    -- Выбираем из таблицы Teachers ID препода, где имя и фамилия препода равны следующему выражению
+    WHERE teachers_id = (
+        SELECT id
+        FROM Teachers
+        WHERE name = 'Карл' AND last_name = 'Густав Юнг'));
+
+
