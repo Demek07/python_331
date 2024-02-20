@@ -122,19 +122,45 @@ CREATE TABLE MarvelCharacters_New (
     FOREIGN KEY (status_id) REFERENCES LivingStatus(status_id)
 );
 
+-- Открываем транзакцию
+BEGIN TRANSACTION;
+
+
 -- Шаг 8: Наполняем новую таблицу с персонажами данными
 
-INSERT INTO MarvelCharacters_New (page_id, name, urlslug, identity_id, align_id, eye_id, hair_id, sex_id, status_id, APPEARANCES, FIRST_APPEARANCE, Year)
-SELECT mc.page_id, mc.name, mc.urlslug,
-       id.identity_id, al.align_id, ec.eye_id, hc.hair_id, s.sex_id, ls.status_id,
-       mc.APPEARANCES, mc.FIRST_APPEARANCE, mc.Year
-FROM MarvelCharacters mc -- назначение псевдонима для таблицы MarvelCharacters
-JOIN Identity id ON mc.identify = id.identity
-JOIN Alignment al ON mc.ALIGN = al.name
-JOIN EyeColor ec ON mc.EYE = ec.color
-JOIN HairColor hc ON mc.HAIR = hc.color
-JOIN Sex s ON mc.SEX = s.name
-JOIN LivingStatus ls ON mc.ALIVE = ls.status;
+--INSERT INTO MarvelCharacters_New (page_id, name, urlslug, identity_id, align_id, eye_id, hair_id, sex_id, status_id, APPEARANCES, FIRST_APPEARANCE, Year)
+--SELECT mc.page_id, mc.name, mc.urlslug,
+--       id.identity_id, al.align_id, ec.eye_id, hc.hair_id, s.sex_id, ls.status_id,
+--       mc.APPEARANCES, mc.FIRST_APPEARANCE, mc.Year
+--FROM MarvelCharacters mc -- назначение псевдонима для таблицы MarvelCharacters
+--LEFT JOIN Identity id ON mc.identify = id.identity
+--LEFT JOIN Alignment al ON mc.ALIGN = al.name
+--LEFT JOIN EyeColor ec ON mc.EYE = ec.color
+--LEFT JOIN HairColor hc ON mc.HAIR = hc.color
+--LEFT JOIN Sex s ON mc.SEX = s.name
+--LEFT JOIN LivingStatus ls ON mc.ALIVE = ls.status;
+
+-- Отчасти решает проблему сохранения данных, но не полностью
+-- Null значения подставляются в виде Null, а не в виде соответствующего ID из своих таблиц
+-- Можно пробежаться по этим столбцам и заменить Null на соответствующие ID из своих таблиц через подзапросы
+
+-- Или выбрать иной подход для решения этой проблемы
+INSERT INTO
+MarvelCharacters_New
+    (page_id, name, urlslug, identity_id, Align_id, Eye_id,
+    Hair_id, Sex_id, status_id, APPEARANCES, FIRST_APPEARANCE, Year)
+SELECT
+    m.page_id, m.name, m.urlslug, i.identity_id, a.Align_id, e.Eye_id,
+    h.Hair_id, s.Sex_id, l.status_id, m.APPEARANCES, m.FIRST_APPEARANCE, m.Year
+FROM     MarvelCharacters m
+LEFT JOIN
+    Alignment a ON m.ALIGN = a.name or (m.ALIGN IS NULL and a.name IS NULL),
+    EyeColor e ON m.EYE = e.color or (m.EYE IS NULL and e.color IS NULL),
+    HairColor h ON m.HAIR = h.color or (m.HAIR IS NULL and h.color IS NULL),
+    Identity i ON m.identify = i.identity or (m.identify IS NULL and i.identity IS NULL),
+    LivingStatus l ON m.ALIVE = l.status or (m.ALIVE IS NULL and l.status IS NULL),
+    Sex s ON m.SEX = s.name or (m.SEX IS NULL and s.name IS NULL);
+
 
 -- Шаг 9: Удаляем старую таблицу MarvelCharacters
 
