@@ -106,3 +106,93 @@ WHERE Students.id NOT IN  -- Если убрать NOT, то получим ст
         WHERE name = 'Карл' AND last_name = 'Густав Юнг'));
 
 
+------------------------------ Таблица для следующего урока ----------------
+-- Карточки с вопросами и ответами для приложения интервального повторения (Anki)
+-- CardID - уникальный идентификатор карточки
+-- Question - вопрос NOT NULL
+-- Answer - ответ NOT NULL
+-- AuthorID - ID автора карточки DEFAULT(1) - ID автора по умолчанию 1 FOREIGN KEY
+-- UploadDate - DATETIME DEFAULT(datetime('now', 'localtime')) - дата и время добавления карточки
+-- Views - количество просмотров
+-- Adds - количество добавлений в избранное
+
+-- Делаем таблицу с авторами
+CREATE TABLE Authors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+);
+
+-- Добавим автора с id 1
+INSERT INTO Authors (name, last_name)
+VALUES ('Владимир', 'Монин');
+
+-- Создаем таблицу с карточками
+CREATE TABLE Cards (
+    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    author_id INTEGER DEFAULT(1),
+    upload_date DATETIME DEFAULT(datetime('now')),
+    views INTEGER DEFAULT(0),
+    adds INTEGER DEFAULT(0),
+    FOREIGN KEY (author_id) REFERENCES Authors(id)
+);
+
+-- Черновик!
+CREATE TABLE CardLogs (
+    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CardID INTEGER,
+    ActionType TEXT, -- Например, "CREATE", "UPDATE", "DELETE"
+    ActionDetails TEXT, -- Описание действия, например, что было изменено
+    AuthorID INTEGER,
+    ActionDate DATETIME DEFAULT (datetime('now')), -- Время совершения действия
+    FOREIGN KEY (CardID) REFERENCES Cards(CardID),
+    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
+);
+
+
+-- Добавим 1 карточку
+INSERT INTO Cards (question, answer)
+VALUES ('Пайтон или Питон?', 'Python!');
+
+-- Добавим таблицу логирования
+CREATE TABLE CardLogs (
+    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CardID INTEGER,
+    ActionType TEXT, -- Например, "CREATE", "UPDATE", "DELETE"
+    ActionDetails TEXT, -- Описание действия, например, что было изменено
+    AuthorID INTEGER,
+    ActionDate DATETIME DEFAULT (datetime('now')), -- Время совершения действия
+    FOREIGN KEY (CardID) REFERENCES Cards(CardID),
+    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
+);
+
+CREATE TRIGGER LogInsertCard
+AFTER INSERT ON Cards
+FOR EACH ROW
+BEGIN
+    INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
+    VALUES (NEW.CardID, 'CREATE', 'Created a new card', NEW.AuthorID, datetime('now'));
+END;
+
+CREATE TRIGGER LogUpdateCard
+AFTER UPDATE ON Cards
+FOR EACH ROW
+BEGIN
+    INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
+    VALUES (OLD.CardID, 'UPDATE', 'Updated a card', NEW.AuthorID, datetime('now'));
+END;
+
+CREATE TRIGGER LogDeleteCard
+AFTER DELETE ON Cards
+FOR EACH ROW
+BEGIN
+    INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
+    VALUES (OLD.CardID, 'DELETE', 'Deleted a card', OLD.AuthorID, datetime('now'));
+END;
+
+-- Обновим запись с id 1
+UPDATE Cards
+SET answer = 'Точно не Питон!'
+WHERE id = 1;
