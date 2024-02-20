@@ -178,3 +178,4 @@ cython_debug/
 /.vscode/settings.json
 /tests/hw_tests/hw_16_tests/students.csv
 /students.csv
+/hw/hw_26/marvel_not_normal.db

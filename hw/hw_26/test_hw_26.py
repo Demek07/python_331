@@ -10,7 +10,7 @@ import sqlite3
 import pytest
 
 DB_PATH = "marvel_not_normal.db"
-SQL_FILE = "hw_32.sql"
+SQL_FILE = "hw_26.sql"
 
 TABLES = [
     'Sex',
