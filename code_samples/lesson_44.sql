@@ -5,6 +5,7 @@
     -- Один к одному
     -- Один ко многим
 -- Многие ко многим
+-- Начали Триггеры
 
 
 -- Многие ко многим - Many to Many
@@ -129,7 +130,7 @@ VALUES ('Владимир', 'Монин');
 
 -- Создаем таблицу с карточками
 CREATE TABLE Cards (
-    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CardID INTEGER PRIMARY KEY AUTOINCREMENT,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
     author_id INTEGER DEFAULT(1),
@@ -139,58 +140,51 @@ CREATE TABLE Cards (
     FOREIGN KEY (author_id) REFERENCES Authors(id)
 );
 
--- Черновик!
-CREATE TABLE CardLogs (
-    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
-    CardID INTEGER,
-    ActionType TEXT, -- Например, "CREATE", "UPDATE", "DELETE"
-    ActionDetails TEXT, -- Описание действия, например, что было изменено
-    AuthorID INTEGER,
-    ActionDate DATETIME DEFAULT (datetime('now')), -- Время совершения действия
-    FOREIGN KEY (CardID) REFERENCES Cards(CardID),
-    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
-);
-
 
 -- Добавим 1 карточку
 INSERT INTO Cards (question, answer)
 VALUES ('Пайтон или Питон?', 'Python!');
 
--- Добавим таблицу логирования
+-- Исправленное определение таблицы CardLogs
 CREATE TABLE CardLogs (
     LogID INTEGER PRIMARY KEY AUTOINCREMENT,
     CardID INTEGER,
-    ActionType TEXT, -- Например, "CREATE", "UPDATE", "DELETE"
-    ActionDetails TEXT, -- Описание действия, например, что было изменено
+    ActionType TEXT,
+    ActionDetails TEXT,
     AuthorID INTEGER,
-    ActionDate DATETIME DEFAULT (datetime('now')), -- Время совершения действия
-    FOREIGN KEY (CardID) REFERENCES Cards(CardID),
-    FOREIGN KEY (AuthorID) REFERENCES Users(UserID)
+    ActionDate DATETIME DEFAULT (datetime('now')),
+    FOREIGN KEY (CardID) REFERENCES Cards(CardID), -- Исправлено на правильное имя столбца
+    FOREIGN KEY (AuthorID) REFERENCES Authors(id) -- Ссылка на таблицу Authors
 );
 
+
+-- Триггер для логирования вставки новой карточки
 CREATE TRIGGER LogInsertCard
 AFTER INSERT ON Cards
 FOR EACH ROW
 BEGIN
     INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
-    VALUES (NEW.CardID, 'CREATE', 'Created a new card', NEW.AuthorID, datetime('now'));
+    VALUES (NEW.CardID, 'CREATE', 'Created a new card', NEW.author_id, datetime('now'));
 END;
 
+-- Триггер для логирования обновления карточки
 CREATE TRIGGER LogUpdateCard
 AFTER UPDATE ON Cards
 FOR EACH ROW
 BEGIN
     INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
-    VALUES (OLD.CardID, 'UPDATE', 'Updated a card', NEW.AuthorID, datetime('now'));
+    VALUES (NEW.CardID, 'UPDATE', 'Updated a card. Question was: ' || OLD.question || '. Answer was: ' || OLD.answer, NEW.author_id, datetime('now'));
 END;
 
+-- Триггер для логирования удаления карточки
 CREATE TRIGGER LogDeleteCard
 AFTER DELETE ON Cards
 FOR EACH ROW
 BEGIN
     INSERT INTO CardLogs (CardID, ActionType, ActionDetails, AuthorID, ActionDate)
-    VALUES (OLD.CardID, 'DELETE', 'Deleted a card', OLD.AuthorID, datetime('now'));
+    VALUES (OLD.CardID, 'DELETE', 'Deleted a card. Question was: ' || OLD.question || '. Answer was: ' || OLD.answer, OLD.author_id, datetime('now'));
 END;
+
 
 -- Обновим запись с id 1
 UPDATE Cards
