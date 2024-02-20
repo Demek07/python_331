@@ -3,6 +3,8 @@
 -- JOIN, LEFT JOIN, RIGHT JOIN
 -- UNION ?
 -- CRUD для нескольких таблиц
+-- Транзакции
+-- VIEW
 
 -- Сделаем таблицу с котиками
 -- id, name, shop_id
