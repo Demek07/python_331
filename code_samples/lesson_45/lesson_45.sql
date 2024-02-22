@@ -24,17 +24,17 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 -- Добавим пользователя с id 1
---INSERT INTO Users (FirstName)
---VALUES ('Владимир');
+INSERT INTO Users (FirstName)
+VALUES ('Владимир');
 
 -- Создаем таблицу с карточками
-CREATE TABLE IF NOT EXISTS Cards (
+CREATE TABLE Cards (
     CardID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Question TEXT NOT NULL,
-    Answer TEXT NOT NULL,
-    AuthorID INTEGER DEFAULT 1,
-    FOREIGN KEY (AuthorID) REFERENCES Users(UserID) ON UPDATE CASCADE ON DELETE SET DEFAULT,
-    UploadDate DATETIME DEFAULT(datetime('now')),
-    Views INTEGER DEFAULT 0,
-    Adds INTEGER DEFAULT 0
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    user_id INTEGER DEFAULT(1),
+    upload_date DATETIME DEFAULT(datetime('now')),
+    views INTEGER DEFAULT(0),
+    adds INTEGER DEFAULT(0),
+    FOREIGN KEY (user_id) REFERENCES Users(UserID)
 );
