@@ -1,5 +1,7 @@
 """
 # TODO Почему добавилась карточка с user_id = 2 когда в таблице юзеров такого id нет?
+# Чем по факту является DATETIME в sqlite? Почему этого нет в документации но есть в SQLitestudio
+conn.execute("PRAGMA foreign_keys = ON;") - включает поддержку внешних ключей
 
 Lesson 45
 22.02.2024
@@ -9,7 +11,13 @@ Lesson 45
 3. Основные объекты sqlite3
 - Objects: Connection, Cursor
 4. Основные методы объектов sqlite3
-- Methods: connect(), cursor(), executescript(), execute(), fetchone(), fetchall()
+- Methods:
+connect() - создает подключение к БД
+cursor() - объект курсора для выполнения запросов
+executescript() - выполнение нескольких запросов (разделенных точкой с запятой)
+execute() - выполнение одного запроса
+fetchone() - получение одной строки (если их больше - вернет первую)
+fetchall() - получение всех строк
 
 
 -- Создаем таблицу с карточками
@@ -42,6 +50,14 @@ CARDS = [
 2. cursor.executemany() - выполнение одного запроса много раз
 3. cursor.executescript() - выполнение нескольких запросов (разделенных точкой с запятой)
 """
+
+
+# Функция с использованием контекстоного менеджера для работы с базой данных
+def read_sql_script(db_path: str, query: str):
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
 
 
 def read_sql_script(file_path: str) -> str:
@@ -83,35 +99,82 @@ def execute_many_query(cursor: sqlite3.Cursor, query: str, data: list):
     cursor.executemany(query, data)
 
 
+def get_card_dict_by_row(row_data: tuple) -> dict:
+    """
+    Преобразует данные из строки в словарь
+    :param row_data: данные из строки
+    :return: словарь
+    """
+    return {
+        'CardID': row_data[0],
+        'question': row_data[1],
+        'answer': row_data[2],
+        'user_id': row_data[3],
+        'upload_date': row_data[4],
+        'views': row_data[5],
+        'adds': row_data[6],
+    }
+
+
+def get_card_by_id(cursor: sqlite3.Cursor, card_id: int):
+    """
+    Получает карточку по ID
+    :param cursor: курсор
+    :param card_id: ID карточки
+    :return: карточка
+    """
+    cursor.execute(f"SELECT * FROM Cards WHERE CardID = {card_id}")
+    row_data = cursor.fetchone()
+    result_dict = get_card_dict_by_row(row_data)
+    return result_dict
+
+
+def get_all_cards(cursor: sqlite3.Cursor):
+    """
+    Получает все карточки
+    :param cursor: курсор
+    :return: список карточек
+    """
+    cursor.execute("SELECT * FROM Cards")
+    rows_data = cursor.fetchall()
+    print(rows_data)
+    result = [get_card_dict_by_row(row) for row in rows_data]
+    return result
+
+
 def main():
     # Создаем подключение к БД
-    conn = sqlite3.connect(DB_PATH)
+    with sqlite3.connect(DB_PATH) as conn:
 
-    # Создаем курсор - это специальный объект, который делает запросы и получает их результаты
-    cursor = conn.cursor()
+        # Создаем курсор - это специальный объект, который делает запросы и получает их результаты
+        cursor = conn.cursor()
 
-    # Читаем SQL скрипт из файла
-    sql_script = read_sql_script(SQL_SCRIPT_PATH)
+        # Читаем SQL скрипт из файла
+        sql_script = read_sql_script(SQL_SCRIPT_PATH)
 
-    # Выполняем SQL скрипт
-    # execute_sql_script(cursor, conn, sql_script)
+        # Выполняем SQL скрипт
+        # execute_sql_script(cursor, conn, sql_script)
 
-    # Выполняем один запрос - обновим таблицу Users добавим FirstName
-    user_name = 'Дмитрий'
-    query_add_user = f"INSERT INTO Users (FirstName) VALUES ('{user_name}')"
+        # Выполняем один запрос - обновим таблицу Users добавим FirstName
+        user_name = 'Дмитрий'
+        query_add_user = f"INSERT INTO Users (FirstName) VALUES ('{user_name}')"
 
-    # execute_one_query(cursor, query_add_user)
+        # execute_one_query(cursor, query_add_user)
 
-    # Commit
-    # conn.commit()
+        # Commit
+        # conn.commit()
 
-    # Выполняем один запрос - добавим карточки
-    query_add_card = "INSERT INTO Cards (question, answer, user_id) VALUES (?, ?, ?)"
-    execute_many_query(cursor, query_add_card, CARDS)
+        # Выполняем один запрос - добавим карточки
+        query_add_card = "INSERT INTO Cards (question, answer, user_id) VALUES (?, ?, ?)"
+        # execute_many_query(cursor, query_add_card, CARDS)
 
-    conn.commit()
-    # Закрываем соединение
-    conn.close()
+        # conn.commit()
+
+        print(get_card_by_id(cursor, 2))
+        print(get_all_cards(cursor))
+
+        # Закрываем соединение (Уже не надо - мы в контекстном менеджере)
+
 
 
 if __name__ == '__main__':
