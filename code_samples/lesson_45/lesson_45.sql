@@ -17,8 +17,8 @@
 --   - `FirstName`: TEXT
 
 
--- Создаем таблицу с юзерами
-CREATE TABLE Users (
+-- Создаем таблицу с юзерами если она не существует
+CREATE TABLE IF NOT EXISTS Users (
     UserID INTEGER PRIMARY KEY AUTOINCREMENT,
     FirstName TEXT NOT NULL
 );
@@ -28,7 +28,7 @@ CREATE TABLE Users (
 --VALUES ('Владимир');
 
 -- Создаем таблицу с карточками
-CREATE TABLE Cards (
+CREATE TABLE IF NOT EXISTS Cards (
     CardID INTEGER PRIMARY KEY AUTOINCREMENT,
     Question TEXT NOT NULL,
     Answer TEXT NOT NULL,
