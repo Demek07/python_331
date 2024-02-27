@@ -2,38 +2,74 @@ import sqlite3
 import json
 
 
-def read_json(file_path):
+def read_json(file_path: str) -> list[dict]:
+    """
+    Чтение данных из JSON
+    :param file_path: путь к файлу
+    :return: данные из JSON
+    """
     with open(file_path, 'r', encoding='utf-8') as file:
         return json.load(file)
 
 
-def read_sql_queries(file_path):
+def read_sql_queries(file_path: str) -> str:
+    """
+    Чтение SQL-запросов из файла
+    :param file_path: путь к файлу
+    :return: SQL-запросы
+    """
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
 
-def execute_query(query, db_path):
+def execute_query(query: str, db_path: str) -> None:
+    """
+    Выполнение SQL-запроса
+    :param query: Один SQL-запрос
+    :param db_path: путь к БД
+    :return: None
+    """
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(query)
         conn.commit()
 
 
-def execute_many_queries(query, params, db_path):
+def execute_many_queries(query: str, params: list[tuple], db_path: str) -> None:
+    """
+    Выполнение нескольких SQL-запросов
+    :param query: Один SQL-запрос в формате VALUES (?, ?, ?)
+    :param params: список кортежей с параметрами
+    :param db_path: путь к БД
+    :return: None
+    """
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.executemany(query, params)
         conn.commit()
 
 
-def fetch_data(query, db_path):
+def fetch_data(query: str, db_path: str) -> list[tuple]:
+    """
+    Получение данных из БД
+    :param query: SQL-запрос
+    :param db_path: путь к БД
+    :return: данные из БД
+    """
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(query)
         return cursor.fetchall()
 
 
-def get_city_data(city_name, db_path):
+def get_city_data(city_name: str, db_path: str) -> list[tuple]:
+    """
+    Получение данных о городе
+    :param city_name: название города
+    :param db_path: путь к БД
+    :return: данные о городе
+    """
+
     query = f'''
     SELECT * FROM city
     JOIN subject ON city.subject_id = subject.id
@@ -59,8 +95,14 @@ def main():
     cities_data = read_json(json_file_path)
 
     # Подготовка данных для вставки в БД
-    cities = [(city['name'], city['coords']['lat'], city['coords']['lon'],
-               city['population'], city['subject'], city['district']) for city in cities_data]
+    cities = [(city['name'],
+               city['coords']['lat'],
+               city['coords']['lon'],
+               city['population'],
+               city['subject'],
+               city['district'])
+              for city in cities_data]
+
 
     subjects = [(city['subject'],) for city in cities_data]
     districts = [(city['district'],) for city in cities_data]
@@ -71,7 +113,7 @@ def main():
     VALUES (?)
     '''
 
-    execute_many_queries(insert_subject_query, subjects, db_path)
+    # execute_many_queries(insert_subject_query, subjects, db_path)
 
     # Запрос для query-параметров execute_many_queries (для вставки данных в таблицу district)
     insert_district_query = '''
@@ -89,7 +131,7 @@ def main():
         (SELECT id FROM district WHERE district_name = ?))
     '''
 
-    execute_many_queries(insert_city_query, cities, db_path)
+    # execute_many_queries(insert_city_query, cities, db_path)
 
     # Пример запроса данных о городе
     city_info = get_city_data('Санкт-Петербург', db_path)

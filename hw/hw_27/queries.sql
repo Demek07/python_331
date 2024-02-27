@@ -6,19 +6,20 @@
 --        Для каждой таблицы должен быть указан первичный ключ.
 
 -- subject
-CREATE TABLE subject (
+CREATE TABLE IF NOT EXISTS subject (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     subject_name TEXT NOT NULL
 );
 
 -- district
-CREATE TABLE district (
+CREATE TABLE IF NOT EXISTS district (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     district_name TEXT NOT NULL
 );
 
 -- city
-CREATE TABLE city (
+
+CREATE TABLE IF NOT EXISTS city (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     city_name TEXT NOT NULL,
     lat REAL NOT NULL,
@@ -29,3 +30,6 @@ CREATE TABLE city (
     FOREIGN KEY (subject_id) REFERENCES subject(id),
     FOREIGN KEY (district_id) REFERENCES district(id)
 );
+
+-- Содание индекса для city_name
+CREATE INDEX IF NOT EXISTS city_name ON city(city_name);
