@@ -2,6 +2,7 @@
 Lesson 47
 29.02.2024
 """
+from typing import List, Union, Dict, Set
 
 """
 Функция 1. get_data_from_csv(file_path: str) -> List[Dict[str, Union[int, str]]]:
@@ -92,3 +93,38 @@ set_tag_3 = {tag for row in row_tags for tag in json.loads(row)}
 # pprint(set_tag_3)
 
 print(len(set_tags), len(set_tags_2), len(set_tag_3))
+
+
+def get_data_from_csv(file_path: str) -> List[Dict[str, Union[int, str]]]:
+    """
+    Читает CSV файл (Вариант от Дмитрия)
+    :param file_path: путь к файлу
+    :return: возвращает содержимое файла
+    """
+    data_dict = {}
+    with open(file_path, mode='r') as file:
+        reader = csv.DictReader(file, delimiter=';')
+        for row in reader:
+            card_id = row['CardID']
+            category = row['category']
+            tags = json.loads(row['tags'])
+            data_dict[card_id] = {'card_id': card_id, 'category': category, 'tags': tags}
+
+    # print(data_dict.values())
+    return list(data_dict.values())
+
+
+def parse_unique_data_by_key(data: List[Dict[str, Union[int, str]]], key: str) -> Set[str]:
+    """
+    Получает уникальные значения из списка словарей по ключу (Вариант от Дмитрия)
+    :param data:
+    :param key:
+    :return:
+    """
+    tags = []
+    for row in data:
+        tags = tags + row.get(key)
+    return set(tags)
+
+
+
