@@ -89,7 +89,7 @@ def execute_one_query(cursor: sqlite3.Cursor, query: str):
     cursor.execute(query)
 
 
-def execute_many_query(cursor: sqlite3.Cursor, query: str, data: list):
+def execute_many_query(cursor: sqlite3.Cursor, query: str, data: list|set):
     """
     Выполняет один запрос много раз
     :param cursor: курсор

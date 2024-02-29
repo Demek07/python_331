@@ -3,14 +3,16 @@ Lesson 47
 29.02.2024
 """
 from typing import List, Union, Dict, Set
+import csv, json, sqlite3
+from pprint import pprint
+from code_samples.lesson_45.lesson_45 import execute_one_query, execute_many_query
 
 """
 Функция 1. get_data_from_csv(file_path: str) -> List[Dict[str, Union[int, str]]]:
 Функция 2. parse_unique_data_by_key(data: List[Dict[str, Union[int, str]]], key: str) -> Set[str]:
 """
 
-import csv, json, sqlite3
-from pprint import pprint
+
 
 CSV_PATH = '../../data/cards_tags.csv'
 DB_PATH = '../../data/lesson_47.db'
@@ -127,4 +129,32 @@ def parse_unique_data_by_key(data: List[Dict[str, Union[int, str]]], key: str) -
     return set(tags)
 
 
+# Сейчас мы откроем контекстный менеджер, откроем соединение с БД DB_PATH, создадим курсор
+# Запишем данные в таблицы
 
+"""
+CREATE TABLE IF NOT EXISTS Categories (
+    CategoryID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL UNIQUE
+);
+
+-- Таблица: Tags
+CREATE TABLE IF NOT EXISTS Tags (
+    TagID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL UNIQUE
+);
+
+"""
+
+with sqlite3.connect(DB_PATH) as conn:
+
+    cursor = conn.cursor()
+
+    tags_add_query = "INSERT INTO Tags (Name) VALUES (?);"
+    tags_data = [(tag,) for tag in set_tags_2]
+
+    categories_add_query = "INSERT INTO Categories (Name) VALUES (?);"
+    categories_data = [(category,) for category in categories]
+
+    execute_many_query(cursor, tags_add_query, tags_data)
+    execute_many_query(cursor, categories_add_query, categories_data)
