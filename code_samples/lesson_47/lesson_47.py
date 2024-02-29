@@ -27,6 +27,16 @@ def get_data_from_csv(file_path: str) -> list:
         reader = csv.DictReader(file, delimiter=';', lineterminator='\n')
         return list(reader)
 
+csv_list_list = [
+    ['id', 'category', 'tags'],
+    ['1', 'python', '["python", "питон", "язык_программирования"]'],
+]
+
+csv_list_dict = [
+    {'id': '1', 'category': 'python', 'tags': '["python", "питон", "язык_программирования"]'},
+]
+
+
 
 
 def parse_unique_data_by_key(data: list, key: str) -> set:
@@ -39,3 +49,46 @@ def parse_unique_data_by_key(data: list, key: str) -> set:
     return {row[key] for row in data}
 
 
+
+def parse_tags_by_json_string(data: list, key: str) -> set:
+    """
+    Функция, которая позволяет получить уникальные значения из списка словарей по ключу
+    :param data: List[Dict[str, Union[int, str]]]: список данных
+    :param key: str: ключ
+    :return: set: уникальные значения
+    """
+    unique_json_string_list = parse_unique_data_by_key(data, key) # {'["python", "питон", "язык_программирования"]'}
+
+    # Сет для хранения уникальных значений
+    result = set()
+    # Обходим список уникальных JSON строк
+    for json_string in unique_json_string_list:
+        # Преобразуем строку в список
+        data = json.loads(json_string)
+
+        # Обновляем сет. Метод update() добавляет элементы из другой коллекции
+        result.update(data)
+
+    return result
+
+
+# Тестирование 2х функций
+# Получаем данные из csv файла
+data = get_data_from_csv(CSV_PATH)
+# Получаем уникальные категории
+categories = parse_unique_data_by_key(data, 'category')
+row_tags = parse_unique_data_by_key(data, 'tags')
+
+# Обходим row_tags и преобразуем строку в список, каждый элемент которой вкладыавем в сет
+
+set_tags = {tag for tag in {tag for row in row_tags for tag in json.loads(row)}} # Это работает, но оно излишнее
+set_tags_2 = parse_tags_by_json_string(data, 'tags')
+set_tag_3 = {tag for row in row_tags for tag in json.loads(row)}
+
+# pprint(categories)
+# pprint(row_tags)
+# pprint(set_tags_2)
+# pprint(data)
+# pprint(set_tag_3)
+
+print(len(set_tags), len(set_tags_2), len(set_tag_3))
