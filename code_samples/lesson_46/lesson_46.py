@@ -12,6 +12,7 @@ Lesson 46
 import csv
 import json
 import time
+from pprint import pprint
 
 import openai
 from openai import OpenAI
@@ -64,7 +65,7 @@ WRITER_TASK = rf"""
 2. Определи теги для этой карточки. Придерживайся следующих правил:\
 - Используй два языка. Русский и Английский для тегов.
 - Английский язык: для названия технологий, категорий, ключевых слов и т.д.
-- Русский язык: для общих, описательных, составных тегов, вроде "лучшие практики", "базы данных" и т.д.
+- Русский язык: для общих, описательных, составных тегов
 - Теги должны быть в нижнем регистре
 - Теги должны быть без пробелов
 - Теги должны быть уникальными
@@ -73,13 +74,13 @@ WRITER_TASK = rf"""
 - ЧАСТЬ тегов должна быть ОБЩАЯ, а ЧАСТЬ - СПЕЦИФИЧНАЯ для данной карточки
 - ИСПОЛЬЗУЙ категорию в тегах. Категорию пиши на английском языке
 
-!!!НЕ МЕНЕЕ 4 ТЕГОВ И  БОЛЕЕ 10 ТЕГОВ ДЛЯ КАЖДОЙ КАРТОЧКИ.
+!!!НЕ МЕНЕЕ 2 ТЕГОВ И  БОЛЕЕ 6 ТЕГОВ ДЛЯ КАЖДОЙ КАРТОЧКИ.
 !!!Ответ в виде JSON строки.
 !!!Объект должен содержать ключи "category" и "tags".
 "category" - строка, название категории.
 "tags" - список строк, названия тегов. На РУССКОМ и английском языке.\
 ИСПОЛЬЗУЙ ОПИСАННЫЕ МНОЙ ПРАВИЛА ДЛЯ ЯЗЫКА ТЕГОВ\
-!!! НЕ ДЕЛАЙ СОСТАВНЫЕ ТЕГИ ИЗ РАЗНЫХ ЯЗЫКОВ НИКОГДА!!!!!\
+!!! НЕ ДЕЛАЙ СОСТАВНЫЕ ТЕГИ ИЗ английского и русского ЯЗЫКОВ НИКОГДА!!!!!\
 
 Вот вопрос и ответ:\
 
@@ -98,9 +99,13 @@ def get_unique_cards(db_path: str) -> List[Dict[str, str]]:
     result = []
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT DISTINCT question, answer FROM Cards")
+        cursor.execute("SELECT DISTINCT question, answer, CardID FROM Cards;")
         for row in cursor.fetchall():
-            result.append({"question": row[0], "answer": row[1]})
+            result.append({
+                'question': row[0],
+                'answer': row[1],
+                'CardID': row[2],
+            })
     return result
 
 
@@ -118,8 +123,9 @@ def append_tags_to_csv(data: Dict[str, str], csv_path: str):
     """
     with open(csv_path, 'a', newline='', encoding='windows-1251') as file:
         writer = csv.writer(file, delimiter=';', lineterminator='\n')
-        writer = csv.DictWriter(file, fieldnames=data.keys(), delimiter=';', lineterminator='\n')
-        writer.writeheader()
+        writer = csv.DictWriter(file, fieldnames=data.keys(), delimiter=';',
+                                lineterminator='\n')
+        # writer.writeheader()
         writer.writerow(data)
 
 
@@ -150,10 +156,10 @@ def get_request_open_ai(system_role_content: str, role_content: str,
     # Отправляем запрос в OpenAI API
     while True:
         try:
-            print(f'\n{"-" * 20}\n'
-                  'Отправляем запрос в OpenAI API\n'
-                  f'Модель: {model}\n'
-                  f'{"-" * 20}\n')
+            # print(f'\n{"-" * 20}\n'
+            #       'Отправляем запрос в OpenAI API\n'
+            #       f'Модель: {model}\n'
+            #       f'{"-" * 20}\n')
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
@@ -174,27 +180,44 @@ def get_request_open_ai(system_role_content: str, role_content: str,
     return result_dict
 
 
-QESTION = "## Что делает оператор `EXPLAIN`?"
-ANSWER = """
-EXPLAIN - это инструкция, которая позволяет получить информацию о том, как база данных выполняет запрос.
-"""
+# Функция main, в которой будет чтение данных из базы, запрос в OpenAI и запись в CSV
+def main():
+    # Получаем уникальные вопросы и ответы из базы
+    unique_cards = get_unique_cards(DB_PATH)
+    count = 0
+    len_task = len(unique_cards)
 
-kwargs_dict = {
-    'temperature': 1,
-    'max_tokens': 400,
-    'system_role_content': ROLE_CONTENT,
-    'prompt': WRITER_TASK + '\n' + QESTION + '\n' + ANSWER,
-    'model': 'gpt-3.5-turbo-0125',
-    'role_content': 'user',
-    'system_role': 'system'
-}
+    # Проходимся по всем вопросам и ответам
+    for card in unique_cards:
+        # Формируем параметры запроса
 
-# Тестируем запрос и запись ответа в CSV
-result = get_request_open_ai(**kwargs_dict)
-final_result = {
-    'question': QESTION.strip(),
-    'answer': ANSWER.strip(),
-    'category': result.get('category').strip(),
-    'tags': json.dumps(result.get('tags'), ensure_ascii=False)
-}
-append_tags_to_csv(final_result, RESULT_CSV)
+        kwargs_dict = {
+            'temperature': 0.6,
+            'max_tokens': 500,
+            'system_role_content': ROLE_CONTENT,
+            'prompt': WRITER_TASK + '\n' + card.get('question').strip() + '\n' + card.get('answer').strip(),
+            'model': 'gpt-4-0125-preview',
+            'role_content': 'user',
+            'system_role': 'system'
+        }
+        # pprint(kwargs_dict)
+        # Запрос в OpenAI
+        result = get_request_open_ai(**kwargs_dict)
+
+        # Формируем словарь для записи в CSV
+        final_result = {
+            'CardID': card.get('CardID'),
+            'category': result.get('category'),
+            'tags': json.dumps(result.get('tags'), ensure_ascii=False)
+        }
+        #         pprint(f'\n\nФинальный результат: {final_result}')
+
+        # Запись в CSV
+        append_tags_to_csv(final_result, RESULT_CSV)
+
+        count += 1
+        print(f'{count} из {len_task} обработано и записано в CSV')
+
+
+if __name__ == '__main__':
+    main()
