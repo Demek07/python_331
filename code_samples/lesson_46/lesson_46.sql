@@ -24,6 +24,15 @@ CREATE TABLE IF NOT EXISTS Users (
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
 
+-- Посчитать максимальную длину вопроса и ответа
+SELECT MAX(LENGTH(question)), MAX(LENGTH(answer)) FROM Cards;
+
+-- Посчитать среднюю длину вопроса и ответа
+SELECT AVG(LENGTH(question)), AVG(LENGTH(answer)) FROM Cards;
+
+-- Вывести карточку с максимальной длиной ответа
+SELECT * FROM Cards WHERE LENGTH(answer) = (SELECT MAX(LENGTH(answer)) FROM Cards);
+
 --------------------------------------------------------
 -- Но для успешной работы нам нужно усложнить БД
 
