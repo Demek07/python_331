@@ -44,3 +44,33 @@ CREATE TABLE IF NOT EXISTS CardTags (
   
 COMMIT TRANSACTION;  
 PRAGMA foreign_keys = on;
+
+
+-- Получить полные данные по карточке по ID, включая категории и теги
+-- Получается не очень
+SELECT Cards.CardID, Cards.Question, Cards.Answer, Categories.Name, Tags.Name
+FROM Cards
+LEFT JOIN Categories ON Cards.CategoryID = Categories.CategoryID
+LEFT JOIN CardTags ON Cards.CardID = CardTags.CardID
+LEFT JOIN Tags ON CardTags.TagID = Tags.TagID
+WHERE Cards.CardID = 1;
+
+-- Улучшим это
+SELECT 
+    Cards.CardID, 
+    Cards.Question, 
+    Cards.Answer, 
+    Categories.Name AS CategoryName,
+    GROUP_CONCAT(Tags.Name, ', ') AS Tags
+FROM 
+    Cards
+LEFT JOIN 
+    Categories ON Cards.CategoryID = Categories.CategoryID
+LEFT JOIN 
+    CardTags ON Cards.CardID = CardTags.CardID
+LEFT JOIN 
+    Tags ON CardTags.TagID = Tags.TagID
+WHERE 
+    Cards.CardID = 1
+GROUP BY 
+    Cards.CardID, Cards.Question, Cards.Answer, Categories.Name;
