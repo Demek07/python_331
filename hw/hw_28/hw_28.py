@@ -21,8 +21,8 @@ import sqlite3
 
 
 CSV_PATH = 'data/cards_tags.csv'
-DB_PATH = '../../data/lesson_47.db'
-OLD_DB_PATH = '../../data/lesson_45.db'
+DB_PATH = 'data/lesson_47.db'
+OLD_DB_PATH = 'data/lesson_45.db'
 
 
 
@@ -102,3 +102,54 @@ def execute_many_query(query: str, data_for_execute: list):
 # Добавляем категории
 # categories_data = [(category,) for category in categories]
 # execute_many_query(QUERY_ADD_CATEGORIES, categories_data)
+
+
+def get_data_from_db(query: str, db_path: str) -> list:
+    """
+    Функция, которая позволяет получить данные из БД
+    :param query: str: запрос
+    :return: List[Dict[str, Union[int, str]]]: список данных
+    """
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        return cursor.fetchall()
+
+
+# Получаем данные из старой БД
+old_data = get_data_from_db("SELECT CardID, question, answer FROM Cards", OLD_DB_PATH)
+pprint(old_data)
+
+"""
+Пример CSV
+
+ {'CardID': '449',
+  'category': 'SQL',
+  'tags': '["курсор", "база_данных", "работа_с_записями", "declare", "open", '
+          '"fetch", "close", "deallocate", "sql"]'},
+"""
+
+# Расширяем data (добавляем вопросы и ответы)
+for row in data:
+    for old_row in old_data:
+        if int(row['CardID']) == int(old_row[0]):
+            row['question'] = old_row[1]
+            row['answer'] = old_row[2]
+
+
+# Делаем запрос на вставку данных в таблицу, с подзапросом на поиск ID категории
+QUERY_ADD_CARDS = """
+INSERT INTO Cards (Question, Answer, CategoryID)
+SELECT ?, ?, CategoryID
+FROM Categories
+WHERE Name = ?;
+"""
+
+# Готовим данные для вставки
+cards_data = [(row['question'], row['answer'], row['category']) for row in data]
+
+# Выполняем запрос
+execute_many_query(QUERY_ADD_CARDS, cards_data)
+
+
+# 

@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS Tags (
 -- Таблица: Cards  
 CREATE TABLE IF NOT EXISTS Cards (  
     CardID INTEGER PRIMARY KEY AUTOINCREMENT,  
-    Question TEXT NOT NULL UNIQUE,  
-    Answer TEXT NOT NULL UNIQUE,  
+    Question TEXT NOT NULL,  
+    Answer TEXT NOT NULL,  
     UserID INTEGER DEFAULT(1),  
     CategoryID INTEGER,  
     UploadDate DATETIME DEFAULT(datetime('now')),  
