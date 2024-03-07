@@ -72,5 +72,4 @@ LEFT JOIN
     Tags ON CardTags.TagID = Tags.TagID
 WHERE 
     Cards.CardID = 1
-GROUP BY 
-    Cards.CardID, Cards.Question, Cards.Answer, Categories.Name;
+

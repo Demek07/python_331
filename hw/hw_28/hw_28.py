@@ -18,8 +18,6 @@ from pprint import pp, pprint
 
 import sqlite3
 
-from regex import F
-
 
 CSV_PATH = "data/cards_tags.csv"
 DB_PATH = "data/lesson_47.db"
@@ -128,6 +126,8 @@ old_data = get_data_from_db("SELECT CardID, question, answer FROM Cards", OLD_DB
   'category': 'SQL',
   'tags': '["курсор", "база_данных", "работа_с_записями", "declare", "open", '
           '"fetch", "close", "deallocate", "sql"]'},
+  'question': 'Что такое курсор в SQL?',
+  'answer': 'Курсор - это объект, который предоставляет доступ к результатам запроса.'},
 """
 
 # Расширяем data (добавляем вопросы и ответы)
@@ -213,9 +213,7 @@ def get_card_details(card_id, db_path):
     LEFT JOIN 
         Tags ON CardTags.TagID = Tags.TagID
     WHERE 
-        Cards.CardID = ?
-    GROUP BY 
-        Cards.CardID, Cards.Question, Cards.Answer, Categories.Name;
+        Cards.CardID = ?;
     """
 
     # Подключение к базе данных и выполнение запроса
